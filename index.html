@@ -740,7 +740,7 @@ const AVATAR_COLORS = [
   ['#FDF0D8','#7A4A00'],['#F5E0E0','#7A1A1A'],['#E0F5F0','#1A6B5A'],
 ];
 
-let supabase = null;
+let sbClient = null;
 let projekti = [];
 let inzenjeri = [];
 let editId = null;
@@ -780,7 +780,7 @@ async function initApp() {
     document.getElementById('appRoot').style.display = 'none';
     return;
   }
-  supabase = window.supabase.createClient(cfg.url, cfg.key);
+  sbClient = window.supabase.createClient(cfg.url, cfg.key);
   document.getElementById('configScreen').style.display = 'none';
   document.getElementById('appRoot').style.display = 'block';
   document.getElementById('firmNameDisplay').textContent = cfg.firma;
@@ -795,8 +795,8 @@ async function initApp() {
 async function loadData() {
   try {
     const [pRes, iRes] = await Promise.all([
-      supabase.from('projekti').select('*').order('od', {ascending: false}),
-      supabase.from('inzenjeri').select('*').order('ime')
+      sbClient.from('projekti').select('*').order('od', {ascending: false}),
+      sbClient.from('inzenjeri').select('*').order('ime')
     ]);
     projekti = pRes.data || [];
     inzenjeri = (iRes.data || []).map(r => r.ime);
@@ -992,7 +992,7 @@ async function addInzenjer() {
   const ime = inp.value.trim();
   if(!ime) return;
   if(inzenjeri.includes(ime)) { showToast('Inženjer već postoji'); return; }
-  const {error} = await supabase.from('inzenjeri').insert({ime});
+  const {error} = await sbClient.from('inzenjeri').insert({ime});
   if(error) { showToast('Greška: ' + error.message); return; }
   inzenjeri.push(ime);
   inzenjeri.sort();
@@ -1006,7 +1006,7 @@ async function addInzenjer() {
 async function removeInzenjer(ime) {
   const cnt = projekti.filter(p=>(p.inzenjeri||[]).includes(ime)).length;
   if(cnt > 0 && !confirm(`${ime} je na ${cnt} projekata. Svejedno ukloniti?`)) return;
-  const {error} = await supabase.from('inzenjeri').delete().eq('ime', ime);
+  const {error} = await sbClient.from('inzenjeri').delete().eq('ime', ime);
   if(error) { showToast('Greška: ' + error.message); return; }
   inzenjeri = inzenjeri.filter(i=>i!==ime);
   populateFilters();
@@ -1074,10 +1074,10 @@ async function saveProject() {
 
   let error;
   if(editId) {
-    ({error} = await supabase.from('projekti').update(data).eq('id', editId));
+    ({error} = await sbClient.from('projekti').update(data).eq('id', editId));
     if(!error) { const idx=projekti.findIndex(p=>p.id===editId); projekti[idx]={...projekti[idx],...data}; }
   } else {
-    const res = await supabase.from('projekti').insert(data).select().single();
+    const res = await sbClient.from('projekti').insert(data).select().single();
     error = res.error;
     if(!error) projekti.unshift(res.data);
   }
