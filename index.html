@@ -338,7 +338,7 @@ function getYear(m){return m?parseInt(m.split('-')[0]):null;}
 function avatarColor(idx){return AVATAR_COLORS[idx%AVATAR_COLORS.length];}
 function initials(ime){return ime.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
-function getInzUloge(p){return Array.isArray(p.inzenjeri_uloge)?p.inzenjeri_uloge:[];}
+function getInzUloge(p){return(p&&Array.isArray(p.inzenjeri_uloge))?p.inzenjeri_uloge:[];}
 
 function populateFilters(){
   ['filterInz','expInz'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const val=el.value;el.innerHTML='<option value="">Svi inženjeri</option>'+inzenjeri.map(i=>`<option${val===i?' selected':''}>${i}</option>`).join('');});
