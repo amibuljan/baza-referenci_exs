@@ -404,7 +404,21 @@ tbody tr:hover{background:#FAFAF8;}
 
 <script>
 const AVATAR_COLORS=[['#E8F0E0','#2D5016'],['#E0E8F5','#1A3A6B'],['#EDE0F5','#4A1A7A'],['#FDF0D8','#7A4A00'],['#F5E0E0','#7A1A1A'],['#E0F5F0','#1A6B5A'],['#F5E8F0','#6B1A4A'],['#F0F0E0','#4A4A16']];
-const ULOGE=['Voditelj projekta','Glavni nadzorni inženjer','Nadzorni inženjer','Pomoćnik nadzornog inženjera','Projektant','Suradnik','Ostalo'];
+const ULOGE=[
+  'Glavni nadzorni inženjer',
+  'FIDIC Inženjer',
+  'Nadzorni inženjer za građevinske radove',
+  'Nadzorni inženjer za strojarske radove',
+  'Nadzorni inženjer za obrtničke radove',
+  'Voditelj projekta',
+  'Pomoćnik voditelja projekta',
+  'Zamjenik voditelja projekta',
+  'Stručnjak za EU sufinanciranje',
+  'Građevinski stručnjak',
+  'Konzultant',
+  'Projektant',
+  'Suradnik projektanta',
+];
 const FIELDS_DEF=[
   {id:'kategorija',label:'Kategorija'},
   {id:'uloga',label:'Vrsta usluge'},
@@ -518,8 +532,12 @@ function renderProjekti(){
   empty.style.display='none';
   tbody.innerHTML=filtered.map(p=>{
     const uloge=getInzUloge(p);
-    const pills=uloge.slice(0,3).map(u=>`<span class="inz-pill" title="${u.uloga||''}">${u.ime.split(' ')[0][0]}. ${u.ime.split(' ').slice(1).join(' ')}</span>`).join('');
-    const more=uloge.length>3?`<span class="inz-pill">+${uloge.length-3}</span>`:'';
+    // Group uloge by ime
+    const ulogeByIme={};
+    uloge.forEach(u=>{if(!ulogeByIme[u.ime])ulogeByIme[u.ime]=[];if(u.uloga)ulogeByIme[u.ime].push(u.uloga);});
+    const uniInz=Object.keys(ulogeByIme);
+    const pills=uniInz.slice(0,3).map(ime=>{const roles=ulogeByIme[ime];const abbr=ime.split(' ')[0][0]+'. '+ime.split(' ').slice(1).join(' ');return`<span class="inz-pill" title="${roles.join(', ')||''}">${abbr}</span>`;}).join('');
+    const more=uniInz.length>3?`<span class="inz-pill">+${uniInz.length-3}</span>`:'';
     const euBadge=p.eu_sufinanciranje?`<span class="badge badge-eu">EU</span>`:'';
     return`<tr>
       <td style="font-weight:500;max-width:200px;line-height:1.4;">${p.naziv} ${euBadge}</td>
@@ -557,7 +575,15 @@ function renderInzenjeri(){
         </div>
       </div>
       <div class="inz-projects">
-        ${uloge_na_proj.slice(0,4).map(u=>`<div class="inz-proj-item"><span class="inz-proj-name">${u.naziv}</span>${u.uloga?`<span class="inz-proj-uloga">${u.uloga}</span>`:''}<span style="font-size:11px;color:var(--text3);font-family:var(--mono);">${getYear(u.od)||''}</span></div>`).join('')}
+        ${(()=>{
+          // Group by project name to avoid duplicates, merge roles
+          const byProj={};
+          uloge_na_proj.forEach(u=>{
+            if(!byProj[u.naziv]) byProj[u.naziv]={...u,uloge:[]};
+            if(u.uloga) byProj[u.naziv].uloge.push(u.uloga);
+          });
+          return Object.values(byProj).slice(0,4).map(u=>`<div class="inz-proj-item"><span class="inz-proj-name">${u.naziv}</span>${u.uloge.length?`<span class="inz-proj-uloga" title="${u.uloge.join(', ')}">${u.uloge[0]}${u.uloge.length>1?' +'+( u.uloge.length-1):''}</span>`:''}<span style="font-size:11px;color:var(--text3);font-family:var(--mono);">${getYear(u.od)||''}</span></div>`).join('');
+        })()}
         ${uloge_na_proj.length>4?`<div style="font-size:11px;color:var(--text3);padding:4px 0;">+ još ${uloge_na_proj.length-4} projekata</div>`:''}
         ${uloge_na_proj.length===0?`<div style="font-size:12px;color:var(--text3);">Nema projekata u bazi</div>`:''}
       </div>
@@ -676,12 +702,30 @@ function openModal(id=null){
   document.getElementById('fNapomena').value=p?.napomena||'';document.getElementById('fOpisRadova').value=p?.opis_radova||'';
   const existingUloge=getInzUloge(p);
   document.getElementById('inzUlogeList').innerHTML=inzenjeri.map(ime=>{
-    const existing=existingUloge.find(u=>u.ime===ime);const uloga=existing?.uloga||'';const checked=!!existing;
-    return`<div class="inz-uloga-row"><label style="display:flex;align-items:center;gap:7px;cursor:pointer;"><input type="checkbox" value="${ime}" ${checked?'checked':''} onchange="toggleUlogaRow(this)"><span class="inz-uloga-name">${ime}</span></label><select class="inz-uloga-select" ${!checked?'disabled':''}><option value="">— odaberi ulogu —</option>${ULOGE.map(u=>`<option${uloga===u?' selected':''}>${u}</option>`).join('')}</select></div>`;
+    const existing=existingUloge.filter(u=>u.ime===ime);
+    const checked=existing.length>0;
+    const ulogeVals=existing.map(u=>u.uloga||'');
+    // Build checkboxes for each role
+    const roleChecks=ULOGE.map(u=>{
+      const isChecked=ulogeVals.includes(u);
+      return`<label style="display:flex;align-items:center;gap:4px;font-size:12px;padding:2px 0;cursor:pointer;"><input type="checkbox" class="role-check" data-ime="${ime}" value="${u}" ${isChecked?'checked':''}> ${u}</label>`;
+    }).join('');
+    const customVal=ulogeVals.filter(u=>!ULOGE.includes(u)&&u).join(', ');
+    return`<div class="inz-uloga-row" style="grid-template-columns:1fr 2fr;">
+      <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-weight:500;font-size:13px;"><input type="checkbox" class="inz-main-check" value="${ime}" ${checked?'checked':''} onchange="toggleUlogaRow(this)"><span>${ime}</span></label>
+      <div class="uloge-panel" style="${!checked?'display:none':''}">
+        <div style="display:flex;flex-wrap:wrap;gap:4px 16px;margin-bottom:6px;">${roleChecks}</div>
+        <input class="custom-uloga" data-ime="${ime}" placeholder="Dodatna uloga (npr. BIM koordinator)..." value="${customVal}" style="width:100%;font-size:12px;padding:4px 8px;">
+      </div>
+    </div>`;
   }).join('');
   document.getElementById('modal').style.display='block';
 }
-function toggleUlogaRow(cb){const row=cb.closest('.inz-uloga-row');const sel=row.querySelector('select');sel.disabled=!cb.checked;if(!cb.checked)sel.value='';}
+function toggleUlogaRow(cb){
+  const row=cb.closest('.inz-uloga-row');
+  const panel=row.querySelector('.uloge-panel');
+  if(panel) panel.style.display=cb.checked?'':'none';
+}
 function closeModal(){document.getElementById('modal').style.display='none';editId=null;}
 async function deleteProject(){
   if(!editId||!confirm('Obrisati ovaj projekt?'))return;
@@ -692,8 +736,19 @@ async function deleteProject(){
 async function saveProject(){
   const naziv=document.getElementById('fNaziv').value.trim();const lokacija=document.getElementById('fLokacija').value.trim();
   if(!naziv||!lokacija){showToast('Naziv i lokacija su obavezni!');return;}
-  const inzUloge=[...document.querySelectorAll('#inzUlogeList input[type=checkbox]:checked')].map(cb=>{
-    const row=cb.closest('.inz-uloga-row');return{ime:cb.value,uloga:row.querySelector('select').value||''};
+  const inzUloge=[];
+  document.querySelectorAll('#inzUlogeList .inz-main-check:checked').forEach(mainCb=>{
+    const ime=mainCb.value;
+    const row=mainCb.closest('.inz-uloga-row');
+    const checkedRoles=[...row.querySelectorAll('.role-check:checked')].map(rc=>rc.value);
+    const customUloga=(row.querySelector('.custom-uloga')?.value||'').trim();
+    const customRoles=customUloga?customUloga.split(',').map(s=>s.trim()).filter(Boolean):[];
+    const allRoles=[...checkedRoles,...customRoles];
+    if(allRoles.length===0){
+      inzUloge.push({ime,uloga:''});
+    } else {
+      allRoles.forEach(uloga=>inzUloge.push({ime,uloga}));
+    }
   });
   const data={
     naziv,lokacija,kategorija:document.getElementById('fKategorija').value.trim()||null,
