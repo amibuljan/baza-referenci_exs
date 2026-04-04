@@ -406,11 +406,18 @@ tbody tr:hover{background:#FAFAF8;}
 const AVATAR_COLORS=[['#E8F0E0','#2D5016'],['#E0E8F5','#1A3A6B'],['#EDE0F5','#4A1A7A'],['#FDF0D8','#7A4A00'],['#F5E0E0','#7A1A1A'],['#E0F5F0','#1A6B5A'],['#F5E8F0','#6B1A4A'],['#F0F0E0','#4A4A16']];
 const ULOGE=['Voditelj projekta','Glavni nadzorni inženjer','Nadzorni inženjer','Pomoćnik nadzornog inženjera','Projektant','Suradnik','Ostalo'];
 const FIELDS_DEF=[
-  {id:'kategorija',label:'Kategorija'},{id:'uloga',label:'Vrsta usluge'},
-  {id:'trajanje',label:'Trajanje'},{id:'status',label:'Status'},
-  {id:'investitor',label:'Naručitelj'},{id:'vrijednost',label:'Vr. radova'},
-  {id:'usluga',label:'Vr. usluge'},{id:'povrsina',label:'Površina'},
-  {id:'eu',label:'EU'},{id:'tim',label:'Tim'},{id:'ugovor',label:'Br. ugovora'},
+  {id:'kategorija',label:'Kategorija'},
+  {id:'uloga',label:'Vrsta usluge'},
+  {id:'trajanje',label:'Trajanje'},
+  {id:'status',label:'Status'},
+  {id:'investitor',label:'Naručitelj'},
+  {id:'vrijednost',label:'Vr. radova'},
+  {id:'usluga',label:'Vr. usluge'},
+  {id:'povrsina',label:'Površina (m²)'},
+  {id:'eu',label:'EU'},
+  {id:'tim',label:'Tim stručnjaka'},
+  {id:'ugovor',label:'Br. ugovora'},
+  {id:'opis',label:'Opis projekta'},
 ];
 
 let sbClient=null,projekti=[],inzenjeri=[],inzProfili={},editId=null,editInzIme=null;
@@ -477,9 +484,13 @@ function populateFilters(){
 
 function initFieldsCheck(){
   const el=document.getElementById('fieldsCheck');
-  el.innerHTML=FIELDS_DEF.map(f=>`<label class="field-pill checked" id="fp_${f.id}" onclick="toggleField(this)"><input type="checkbox" checked value="${f.id}">${f.label}</label>`).join('');
+  el.innerHTML=FIELDS_DEF.map(f=>`<label class="field-pill checked" id="fp_${f.id}" onclick="toggleField(this, event)"><input type="checkbox" checked value="${f.id}">${f.label}</label>`).join('');
 }
-function toggleField(el){el.classList.toggle('checked');el.querySelector('input').checked=el.classList.contains('checked');}
+function toggleField(el, event){
+  event.preventDefault();
+  el.classList.toggle('checked');
+  el.querySelector('input').checked=el.classList.contains('checked');
+}
 function getSelectedFields(){return[...document.querySelectorAll('#fieldsCheck input:checked')].map(c=>c.value);}
 
 function getFilteredProjekti(){
