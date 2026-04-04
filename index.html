@@ -57,7 +57,7 @@ tbody tr:hover{background:#FAFAF8;}
 .badge-nadzor{background:var(--blue-light);color:var(--blue);}
 .badge-vodenje{background:var(--accent-light);color:var(--accent);}
 .badge-projektiranje{background:var(--purple-light);color:var(--purple);}
-.badge-kombinacija{background:var(--amber-light);color:var(--amber);}
+.badge-kombinacija{background:#E0F0F8;color:#1A5A6B;}
 .badge-zavrseno{background:#E8F5E0;color:var(--accent);}
 .badge-u-tijeku{background:var(--blue-light);color:var(--blue);}
 .badge-eu{background:#E0EAF8;color:#1A3A6B;font-size:10px;margin-left:4px;}
@@ -117,9 +117,11 @@ tbody tr:hover{background:#FAFAF8;}
 .gen-option input,.gen-option select,.gen-option textarea{width:100%;font-size:13px;}
 .gen-option textarea{height:50px;}
 .fields-check{display:flex;flex-wrap:wrap;gap:6px;}
-.field-pill{display:flex;align-items:center;gap:4px;padding:3px 8px;border:1px solid var(--border);border-radius:99px;font-size:12px;cursor:pointer;user-select:none;background:var(--surface);}
+.field-pill{display:flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid var(--border);border-radius:99px;font-size:12px;cursor:pointer;user-select:none;background:var(--surface);transition:all 0.15s;}
+.field-pill:hover{border-color:var(--accent-mid);background:var(--accent-light);color:var(--accent);}
 .field-pill input{display:none;}
-.field-pill.checked{background:var(--accent-light);border-color:var(--accent-mid);color:var(--accent);}
+.field-pill.checked{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500;}
+.field-pill.checked:hover{background:var(--accent-mid);border-color:var(--accent-mid);}
 /* SETTINGS */
 .settings-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:14px;}
 .settings-section h3{font-size:11px;font-weight:600;margin-bottom:14px;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;}
@@ -189,7 +191,7 @@ tbody tr:hover{background:#FAFAF8;}
       <div class="section active" id="sec-projekti">
         <div class="toolbar">
           <div class="search-wrap"><span class="search-icon">⌕</span><input id="search" placeholder="Pretraži..." oninput="renderProjekti()"></div>
-          <select id="filterTip" onchange="renderProjekti()"><option value="">Svi tipovi</option><option>Nadzor</option><option>Vođenje</option><option>Projektiranje</option><option>Kombinacija</option></select>
+          <select id="filterTip" onchange="renderProjekti()"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
           <select id="filterStatus" onchange="renderProjekti()"><option value="">Svi statusi</option><option>U tijeku</option><option>Završeno</option></select>
           <select id="filterInz" onchange="renderProjekti()"><option value="">Svi inženjeri</option></select>
           <select id="filterGod" onchange="renderProjekti()"><option value="">Sve godine</option></select>
@@ -223,7 +225,7 @@ tbody tr:hover{background:#FAFAF8;}
           <p>Generiraj Word dokument s odabranim projektima u Exstructa stilu.</p>
           <div class="gen-options">
             <div class="gen-option"><label>Tip usluge (filter)</label>
-              <select id="genTip"><option value="">Svi tipovi</option><option>Nadzor</option><option>Vođenje</option><option>Projektiranje</option><option>Kombinacija</option></select>
+              <select id="genTip"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
             </div>
             <div class="gen-option"><label>Od godine</label><input id="genOdGod" type="number" placeholder="npr. 2020" min="2000" max="2030"></div>
             <div class="gen-option" style="grid-column:1/-1;"><label>Polja za prikaz</label>
@@ -244,7 +246,7 @@ tbody tr:hover{background:#FAFAF8;}
             <div class="gen-option" style="grid-column:1/-1;"><label>Predmet nabave *</label><input id="pisPredmet" placeholder="Usluga stručnog nadzora..."></div>
             <div class="gen-option"><label>Evidencijski broj nabave</label><input id="pisEvBroj" placeholder="npr. 112/24"></div>
             <div class="gen-option"><label>Filter – tip usluge</label>
-              <select id="pisTip"><option value="">Svi tipovi</option><option>Nadzor</option><option>Vođenje</option><option>Projektiranje</option><option>Kombinacija</option></select>
+              <select id="pisTip"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
             </div>
             <div class="gen-option"><label>Od godine</label><input id="pisOdGod" type="number" placeholder="npr. 2022" min="2000" max="2030"></div>
             <div class="gen-option"><label>Grad (za potpis)</label><input id="pisGrad" placeholder="Zagreb" value="Zagreb"></div>
@@ -262,7 +264,7 @@ tbody tr:hover{background:#FAFAF8;}
             </div>
             <div class="gen-option"><label>Pozicija na natječaju *</label><input id="cvPozicija" placeholder="npr. Glavni nadzorni inženjer"></div>
             <div class="gen-option"><label>Filter – tip projekata</label>
-              <select id="cvTip"><option value="">Svi tipovi</option><option>Nadzor</option><option>Vođenje</option><option>Projektiranje</option><option>Kombinacija</option></select>
+              <select id="cvTip"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
             </div>
             <div class="gen-option"><label>Od godine</label><input id="cvOdGod" type="number" placeholder="npr. 2020" min="2000" max="2030"></div>
           </div>
@@ -275,7 +277,7 @@ tbody tr:hover{background:#FAFAF8;}
         <div class="export-card">
           <h3>Filtri za natječaj</h3>
           <div class="toolbar" style="margin-bottom:0;">
-            <select id="expTip" onchange="renderExport()"><option value="">Svi tipovi</option><option>Nadzor</option><option>Vođenje</option><option>Projektiranje</option><option>Kombinacija</option></select>
+            <select id="expTip" onchange="renderExport()"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
             <select id="expStatus" onchange="renderExport()"><option value="">Svi statusi</option><option>U tijeku</option><option>Završeno</option></select>
             <select id="expInz" onchange="renderExport()"><option value="">Svi inženjeri</option></select>
             <select id="expEU" onchange="renderExport()"><option value="">EU i ostalo</option><option value="true">Samo EU</option><option value="false">Bez EU</option></select>
@@ -319,7 +321,7 @@ tbody tr:hover{background:#FAFAF8;}
             <div class="form-group form-full"><label>Naziv projekta *</label><input id="fNaziv" placeholder="Puni naziv projekta"></div>
             <div class="form-group"><label>Lokacija *</label><input id="fLokacija" placeholder="npr. Zagreb"></div>
             <div class="form-group"><label>Kategorija / vrsta objekta</label><input id="fKategorija" placeholder="npr. Zgrada javne namjene"></div>
-            <div class="form-group"><label>Tip usluge *</label><select id="fTip"><option>Nadzor</option><option>Vođenje</option><option>Projektiranje</option><option>Kombinacija</option></select></div>
+            <div class="form-group"><label>Tip usluge *</label><select id="fTip"><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select></div>
             <div class="form-group"><label>Uloga firme</label><input id="fUlogaFirme" placeholder="npr. Stručni nadzor i koordinator ZNR"></div>
             <div class="form-group"><label>Status</label><select id="fStatus"><option>U tijeku</option><option>Završeno</option></select></div>
             <div class="form-group"><label>Broj ugovora</label><input id="fBrojUgovora" placeholder="npr. KLASA: 406-02/22-01/66"></div>
@@ -454,7 +456,7 @@ async function loadData(){
 function fmtVal(v){if(!v)return'–';return Number(v).toLocaleString('hr-HR')+' €';}
 function fmtDate(m){if(!m)return'';const[y,mo]=m.split('-');const mj=['sij.','velj.','ožu.','tra.','svi.','lip.','srp.','kol.','ruj.','lis.','stu.','pro.'];return mj[parseInt(mo)-1]+' '+y;}
 function fmtTrajanje(od,d){if(!od)return'–';return fmtDate(od)+(d?' – '+fmtDate(d):' – u tijeku');}
-function badgeClass(tip){const map={'Nadzor':'nadzor','Vođenje':'vodenje','Projektiranje':'projektiranje','Kombinacija':'kombinacija'};return'badge badge-'+(map[tip]||'nadzor');}
+function badgeClass(tip){const map={'Stručni nadzor':'nadzor','Vođenje projekta':'vodenje','Projektiranje':'projektiranje','Konzultantske usluge':'kombinacija'};return'badge badge-'+(map[tip]||'nadzor');}
 function getYear(m){return m?parseInt(m.split('-')[0]):null;}
 function avatarColor(idx){return AVATAR_COLORS[idx%AVATAR_COLORS.length];}
 function initials(ime){return ime.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();}
@@ -651,7 +653,7 @@ function openModal(id=null){
   document.getElementById('modalTitle').textContent=p?'Uredi projekt':'Novi projekt';
   document.getElementById('btnDelete').style.display=p?'inline-flex':'none';
   document.getElementById('fNaziv').value=p?.naziv||'';document.getElementById('fLokacija').value=p?.lokacija||'';
-  document.getElementById('fKategorija').value=p?.kategorija||'';document.getElementById('fTip').value=p?.tip||'Nadzor';
+  document.getElementById('fKategorija').value=p?.kategorija||'';document.getElementById('fTip').value=p?.tip||'Stručni nadzor';
   document.getElementById('fUlogaFirme').value=p?.uloga_firme||'';document.getElementById('fStatus').value=p?.status||'U tijeku';
   document.getElementById('fBrojUgovora').value=p?.broj_ugovora||'';document.getElementById('fEU').checked=p?.eu_sufinanciranje||false;
   document.getElementById('fVrijednost').value=p?.vrijednost||'';document.getElementById('fVrijednostUsluge').value=p?.vrijednost_usluge||'';
