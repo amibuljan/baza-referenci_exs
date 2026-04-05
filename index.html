@@ -200,9 +200,7 @@ tbody tr:hover{background:#FAFAF8;}
         </div>
         <div class="toolbar" style="margin-top:-10px;">
           <input id="filterMinVr" type="number" placeholder="Min. vr. radova (€)" style="width:170px;" oninput="renderProjekti()">
-          <input id="filterMaxVr" type="number" placeholder="Max. vr. radova (€)" style="width:170px;" oninput="renderProjekti()">
           <input id="filterMinUs" type="number" placeholder="Min. vr. usluge (€)" style="width:165px;" oninput="renderProjekti()">
-          <input id="filterMaxUs" type="number" placeholder="Max. vr. usluge (€)" style="width:165px;" oninput="renderProjekti()">
           <button class="btn btn-sm" onclick="clearFilters()">Očisti filtere</button>
         </div>
         <div class="table-card">
@@ -539,9 +537,7 @@ function getFilteredProjekti(){
   const g=document.getElementById('filterGod')?.value||'';
   const eu=document.getElementById('filterEU')?.value||'';
   const minVr=Number(document.getElementById('filterMinVr')?.value||0);
-  const maxVr=Number(document.getElementById('filterMaxVr')?.value||0);
   const minUs=Number(document.getElementById('filterMinUs')?.value||0);
-  const maxUs=Number(document.getElementById('filterMaxUs')?.value||0);
 
   let res=projekti.filter(p=>{
     if(q&&!p.naziv.toLowerCase().includes(q)&&!(p.lokacija||'').toLowerCase().includes(q)&&!(p.investitor||'').toLowerCase().includes(q)&&!(p.kategorija||'').toLowerCase().includes(q))return false;
@@ -553,9 +549,7 @@ function getFilteredProjekti(){
     if(eu==='true'&&!p.eu_sufinanciranje)return false;
     if(eu==='false'&&p.eu_sufinanciranje)return false;
     if(minVr&&(Number(p.vrijednost)||0)<minVr)return false;
-    if(maxVr&&(Number(p.vrijednost)||0)>maxVr)return false;
     if(minUs&&(Number(p.vrijednost_usluge)||0)<minUs)return false;
-    if(maxUs&&(Number(p.vrijednost_usluge)||0)>maxUs)return false;
     return true;
   });
 
@@ -580,7 +574,7 @@ function sortBy(field){
 }
 
 function clearFilters(){
-  ['search','filterMinVr','filterMaxVr','filterMinUs','filterMaxUs'].forEach(id=>{
+  ['search','filterMinVr','filterMinUs'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value='';
   });
   ['filterTip','filterStatus','filterKat','filterInz','filterGod','filterEU'].forEach(id=>{
