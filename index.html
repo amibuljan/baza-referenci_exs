@@ -193,13 +193,30 @@ tbody tr:hover{background:#FAFAF8;}
           <div class="search-wrap"><span class="search-icon">⌕</span><input id="search" placeholder="Pretraži..." oninput="renderProjekti()"></div>
           <select id="filterTip" onchange="renderProjekti()"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
           <select id="filterStatus" onchange="renderProjekti()"><option value="">Svi statusi</option><option>U tijeku</option><option>Završeno</option></select>
+          <select id="filterKat" onchange="renderProjekti()"><option value="">Sve kategorije</option></select>
           <select id="filterInz" onchange="renderProjekti()"><option value="">Svi inženjeri</option></select>
           <select id="filterGod" onchange="renderProjekti()"><option value="">Sve godine</option></select>
           <select id="filterEU" onchange="renderProjekti()"><option value="">EU i ostalo</option><option value="true">EU projekti</option><option value="false">Bez EU</option></select>
         </div>
+        <div class="toolbar" style="margin-top:-10px;">
+          <input id="filterMinVr" type="number" placeholder="Min. vr. radova (€)" style="width:170px;" oninput="renderProjekti()">
+          <input id="filterMaxVr" type="number" placeholder="Max. vr. radova (€)" style="width:170px;" oninput="renderProjekti()">
+          <input id="filterMinUs" type="number" placeholder="Min. vr. usluge (€)" style="width:165px;" oninput="renderProjekti()">
+          <input id="filterMaxUs" type="number" placeholder="Max. vr. usluge (€)" style="width:165px;" oninput="renderProjekti()">
+          <button class="btn btn-sm" onclick="clearFilters()">Očisti filtere</button>
+        </div>
         <div class="table-card">
           <div class="table-wrap">
-            <table><thead><tr><th>Naziv projekta</th><th>Kategorija</th><th>Tip</th><th>Status</th><th>Vr. radova</th><th>Vr. usluge</th><th>Investitor</th><th>Trajanje</th><th>Inženjeri</th><th></th></tr></thead>
+            <table><thead><tr>
+              <th>Naziv projekta</th>
+              <th onclick="sortBy('kategorija')" style="cursor:pointer;" id="th_kategorija">Kategorija <span id="si_kategorija"></span></th>
+              <th>Tip</th>
+              <th onclick="sortBy('status')" style="cursor:pointer;" id="th_status">Status <span id="si_status"></span></th>
+              <th onclick="sortBy('vrijednost')" style="cursor:pointer;" id="th_vrijednost">Vr. radova <span id="si_vrijednost"></span></th>
+              <th onclick="sortBy('vrijednost_usluge')" style="cursor:pointer;" id="th_vrijednost_usluge">Vr. usluge <span id="si_vrijednost_usluge"></span></th>
+              <th>Investitor</th>
+              <th onclick="sortBy('od')" style="cursor:pointer;" id="th_od">Trajanje <span id="si_od"></span></th>
+              <th>Inženjeri</th><th></th></tr></thead>
             <tbody id="tableBody"></tbody></table>
           </div>
           <div id="tableEmpty" class="empty" style="display:none;"><div class="empty-icon">◻</div><div>Nema projekata prema odabranim filterima</div></div>
@@ -435,6 +452,7 @@ const FIELDS_DEF=[
 ];
 
 let sbClient=null,projekti=[],inzenjeri=[],inzProfili={},editId=null,editInzIme=null;
+let sortField=null,sortDir=1; // sortDir: 1=asc, -1=desc
 
 function loadConfig(){return{url:localStorage.getItem('sb_url'),key:localStorage.getItem('sb_key'),firma:localStorage.getItem('sb_firma')||'Baza referenci'};}
 function saveConfig(){
@@ -494,6 +512,11 @@ function populateFilters(){
   const years=[...new Set(projekti.map(p=>getYear(p.od)).filter(Boolean))].sort((a,b)=>b-a);
   const godEl=document.getElementById('filterGod');const gv=godEl.value;
   godEl.innerHTML='<option value="">Sve godine</option>'+years.map(y=>`<option${gv==y?' selected':''}>${y}</option>`).join('');
+  // Populate category filter
+  const cats=[...new Set(projekti.map(p=>p.kategorija).filter(Boolean))].sort();
+  const katEl=document.getElementById('filterKat');if(!katEl)return;
+  const kv=katEl.value;
+  katEl.innerHTML='<option value="">Sve kategorije</option>'+cats.map(k=>`<option${kv===k?' selected':''}>${k}</option>`).join('');
 }
 
 function initFieldsCheck(){
@@ -511,17 +534,61 @@ function getFilteredProjekti(){
   const q=(document.getElementById('search')?.value||'').toLowerCase();
   const t=document.getElementById('filterTip')?.value||'';
   const st=document.getElementById('filterStatus')?.value||'';
+  const kat=document.getElementById('filterKat')?.value||'';
   const i=document.getElementById('filterInz')?.value||'';
   const g=document.getElementById('filterGod')?.value||'';
   const eu=document.getElementById('filterEU')?.value||'';
-  return projekti.filter(p=>{
+  const minVr=Number(document.getElementById('filterMinVr')?.value||0);
+  const maxVr=Number(document.getElementById('filterMaxVr')?.value||0);
+  const minUs=Number(document.getElementById('filterMinUs')?.value||0);
+  const maxUs=Number(document.getElementById('filterMaxUs')?.value||0);
+
+  let res=projekti.filter(p=>{
     if(q&&!p.naziv.toLowerCase().includes(q)&&!(p.lokacija||'').toLowerCase().includes(q)&&!(p.investitor||'').toLowerCase().includes(q)&&!(p.kategorija||'').toLowerCase().includes(q))return false;
-    if(t&&p.tip!==t)return false;if(st&&p.status!==st)return false;
+    if(t&&p.tip!==t)return false;
+    if(st&&p.status!==st)return false;
+    if(kat&&p.kategorija!==kat)return false;
     if(i&&!getInzUloge(p).some(u=>u.ime===i))return false;
     if(g&&getYear(p.od)!=g)return false;
-    if(eu==='true'&&!p.eu_sufinanciranje)return false;if(eu==='false'&&p.eu_sufinanciranje)return false;
+    if(eu==='true'&&!p.eu_sufinanciranje)return false;
+    if(eu==='false'&&p.eu_sufinanciranje)return false;
+    if(minVr&&(Number(p.vrijednost)||0)<minVr)return false;
+    if(maxVr&&(Number(p.vrijednost)||0)>maxVr)return false;
+    if(minUs&&(Number(p.vrijednost_usluge)||0)<minUs)return false;
+    if(maxUs&&(Number(p.vrijednost_usluge)||0)>maxUs)return false;
     return true;
   });
+
+  // Sorting
+  if(sortField){
+    res=[...res].sort((a,b)=>{
+      let av=a[sortField]||''; let bv=b[sortField]||'';
+      if(sortField==='vrijednost'||sortField==='vrijednost_usluge'){av=Number(av)||0;bv=Number(bv)||0;}
+      if(av<bv)return -1*sortDir; if(av>bv)return 1*sortDir; return 0;
+    });
+  }
+  return res;
+}
+
+function sortBy(field){
+  if(sortField===field){sortDir*=-1;}else{sortField=field;sortDir=1;}
+  // Update header indicators
+  document.querySelectorAll('[id^="si_"]').forEach(el=>el.textContent='');
+  const si=document.getElementById('si_'+field);
+  if(si) si.textContent=sortDir===1?' ↑':' ↓';
+  renderProjekti();
+}
+
+function clearFilters(){
+  ['search','filterMinVr','filterMaxVr','filterMinUs','filterMaxUs'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  ['filterTip','filterStatus','filterKat','filterInz','filterGod','filterEU'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.selectedIndex=0;
+  });
+  sortField=null;sortDir=1;
+  document.querySelectorAll('[id^="si_"]').forEach(el=>el.textContent='');
+  renderProjekti();
 }
 
 function renderProjekti(){
