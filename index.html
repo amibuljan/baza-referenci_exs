@@ -189,19 +189,22 @@ tbody tr:hover{background:#FAFAF8;}
 
       <!-- PROJEKTI -->
       <div class="section active" id="sec-projekti">
-        <div class="toolbar">
-          <div class="search-wrap"><span class="search-icon">⌕</span><input id="search" placeholder="Pretraži..." oninput="renderProjekti()"></div>
-          <select id="filterTip" onchange="renderProjekti()"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
-          <select id="filterStatus" onchange="renderProjekti()"><option value="">Svi statusi</option><option>U tijeku</option><option>Završeno</option></select>
-          <select id="filterKat" onchange="renderProjekti()"><option value="">Sve kategorije</option></select>
-          <select id="filterInz" onchange="renderProjekti()"><option value="">Svi inženjeri</option></select>
-          <select id="filterGod" onchange="renderProjekti()"><option value="">Sve godine</option></select>
-          <select id="filterEU" onchange="renderProjekti()"><option value="">EU i ostalo</option><option value="true">EU projekti</option><option value="false">Bez EU</option></select>
-        </div>
-        <div class="toolbar" style="margin-top:-10px;">
-          <input id="filterMinVr" type="number" placeholder="Min. vr. radova (€)" style="width:170px;" oninput="renderProjekti()">
-          <input id="filterMinUs" type="number" placeholder="Min. vr. usluge (€)" style="width:165px;" oninput="renderProjekti()">
-          <button class="btn btn-sm" onclick="clearFilters()">Očisti filtere</button>
+        <div style="margin-bottom:14px;">
+          <div class="search-wrap" style="max-width:100%;margin-bottom:10px;">
+            <span class="search-icon">⌕</span>
+            <input id="search" placeholder="Pretraži po nazivu, lokaciji, investitoru, kategoriji..." oninput="renderProjekti()" style="width:100%;">
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <select id="filterTip" onchange="renderProjekti()" style="flex:1;min-width:140px;"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
+            <select id="filterStatus" onchange="renderProjekti()" style="flex:1;min-width:110px;"><option value="">Svi statusi</option><option>U tijeku</option><option>Završeno</option></select>
+            <select id="filterKat" onchange="renderProjekti()" style="flex:1;min-width:140px;"><option value="">Sve kategorije</option></select>
+            <select id="filterInz" onchange="renderProjekti()" style="flex:1;min-width:140px;"><option value="">Svi inženjeri</option></select>
+            <select id="filterGod" onchange="renderProjekti()" style="flex:1;min-width:110px;"><option value="">Sve godine</option></select>
+            <select id="filterEU" onchange="renderProjekti()" style="flex:1;min-width:110px;"><option value="">EU i ostalo</option><option value="true">EU projekti</option><option value="false">Bez EU</option></select>
+            <input id="filterMinVr" type="number" placeholder="Min. vr. radova (€)" style="flex:1;min-width:160px;" oninput="renderProjekti()">
+            <input id="filterMinUs" type="number" placeholder="Min. vr. usluge (€)" style="flex:1;min-width:155px;" oninput="renderProjekti()">
+            <button class="btn btn-sm" onclick="clearFilters()" style="white-space:nowrap;flex-shrink:0;">✕ Očisti</button>
+          </div>
         </div>
         <div class="table-card">
           <div class="table-wrap">
