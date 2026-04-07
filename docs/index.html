@@ -269,7 +269,7 @@ tbody tr:hover{background:#FAFAF8;}
       <button class="nav-item" onclick="switchTab('generiraj',this)"><span class="nav-dot"></span> Generiraj dokument</button>
 
       <div class="nav-section">Sustav</div>
-      <button class="nav-item" onclick="switchTab('postavke',this)"><span class="nav-dot"></span> Postavke</button>
+      <button class="nav-item" onclick="switchTab('postavke',this)" style="display:none;"><span class="nav-dot"></span> Postavke</button>
     </nav>
     <div class="sidebar-bottom">
       <div class="sidebar-version">ORDO v1.0</div>
@@ -340,6 +340,10 @@ tbody tr:hover{background:#FAFAF8;}
 
       <!-- PROJEKTI -->
       <div class="section" id="sec-projekti">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div style="font-size:15px;font-weight:600;">Projekti</div>
+          <button class="btn btn-primary" onclick="openModal()">+ Novi projekt</button>
+        </div>
         <div style="margin-bottom:14px;">
           <div class="search-wrap" style="max-width:100%;margin-bottom:10px;">
             <span class="search-icon">⌕</span>
@@ -378,11 +382,15 @@ tbody tr:hover{background:#FAFAF8;}
 
       <!-- INŽENJERI -->
       <div class="section" id="sec-inzenjeri">
-        <div class="toolbar">
-          <div class="search-wrap"><span class="search-icon">⌕</span><input id="searchInz" placeholder="Pretraži inženjere..." oninput="renderInzenjeri()"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div style="font-size:15px;font-weight:600;">Inženjeri</div>
+          <button class="btn btn-primary" onclick="openAddInzModal()">+ Novi inženjer</button>
+        </div>
+        <div class="toolbar" style="margin-bottom:14px;">
+          <div class="search-wrap" style="max-width:100%;"><span class="search-icon">⌕</span><input id="searchInz" placeholder="Pretraži inženjere..." oninput="renderInzenjeri()" style="width:100%;"></div>
         </div>
         <div class="inz-grid" id="inzGrid"></div>
-        <div id="inzEmpty" class="empty" style="display:none;"><div class="empty-icon">◎</div><div>Dodajte inženjere u Postavkama</div></div>
+        <div id="inzEmpty" class="empty" style="display:none;"><div class="empty-icon">◎</div><div>Dodajte prvog inženjera klikom na "+ Novi inženjer"</div></div>
       </div>
 
       <!-- GENERIRAJ -->
@@ -1200,13 +1208,7 @@ function switchTab(name,btn){
   const titles={dashboard:'Pregled',projekti:'Projekti',inzenjeri:'Inženjeri',generiraj:'Generiraj dokument',postavke:'Postavke'};
   document.getElementById('topbarTitle').textContent=titles[name]||name;
   const actEl=document.getElementById('topbarActions');
-  if(name==='projekti'||name==='dashboard'){
-    actEl.innerHTML='<button class="btn btn-primary" onclick="openModal()">+ Novi projekt</button>';
-  } else if(name==='inzenjeri'){
-    actEl.innerHTML='<button class="btn btn-primary" onclick="openAddInzModal()">+ Novi inženjer</button>';
-  } else {
-    actEl.innerHTML='';
-  }
+  actEl.innerHTML='';
   if(name==='dashboard')renderDashboard();
   if(name==='inzenjeri')renderInzenjeri();
   if(name==='generiraj')showGenMenu();
