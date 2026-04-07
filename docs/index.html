@@ -129,17 +129,34 @@ tbody tr:hover{background:#FAFAF8;}
 .inz-uloga-name{font-size:13px;font-weight:500;}
 .inz-uloga-select{font-size:12px;padding:4px 8px;}
 /* INŽENJERI PROFILI */
-.inz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;}
-.inz-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:border-color 0.15s;}
-.inz-card:hover{border-color:var(--border-strong);}
-.inz-card-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
-.avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
-.inz-name{font-weight:600;font-size:14px;}
+.inz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+.inz-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:all 0.15s;cursor:pointer;position:relative;}
+.inz-card:hover{border-color:var(--accent-mid);box-shadow:0 4px 16px rgba(0,0,0,0.08);transform:translateY(-2px);}
+.avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;flex-shrink:0;}
+.inz-name{font-weight:600;font-size:14px;margin-bottom:2px;}
 .inz-meta{font-size:12px;color:var(--text3);}
-.inz-projects{display:flex;flex-direction:column;gap:4px;}
-.inz-proj-item{display:flex;align-items:center;gap:6px;padding:5px 7px;background:var(--bg);border-radius:var(--radius-sm);font-size:12px;}
-.inz-proj-name{flex:1;}
-.inz-proj-uloga{font-size:11px;color:var(--accent);font-weight:500;background:var(--accent-light);padding:1px 6px;border-radius:99px;white-space:nowrap;}
+.inz-stat-row{display:flex;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
+.inz-stat{display:flex;flex-direction:column;gap:2px;}
+.inz-stat-val{font-size:18px;font-weight:700;color:var(--text);line-height:1;}
+.inz-stat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;}
+.inz-card-arrow{position:absolute;top:18px;right:16px;font-size:16px;color:var(--text3);transition:transform 0.15s;}
+.inz-card:hover .inz-card-arrow{transform:translateX(3px);color:var(--accent-mid);}
+/* PROFIL PANEL */
+.inz-profile-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;}
+.inz-profile-header{display:flex;align-items:center;gap:16px;padding:20px 24px;border-bottom:1px solid var(--border);}
+.inz-profile-info{flex:1;}
+.inz-profile-name{font-size:20px;font-weight:700;}
+.inz-profile-sub{font-size:13px;color:var(--text2);margin-top:3px;}
+.inz-profile-meta{display:flex;gap:24px;padding:16px 24px;background:var(--bg);border-bottom:1px solid var(--border);}
+.inz-profile-meta-item{display:flex;flex-direction:column;gap:2px;}
+.inz-profile-meta-val{font-size:14px;font-weight:600;color:var(--text);}
+.inz-profile-meta-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;}
+.inz-proj-list{padding:16px 24px;}
+.inz-proj-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.inz-proj-row:last-child{border-bottom:none;}
+.inz-proj-name{flex:1;font-size:13px;font-weight:500;}
+.inz-proj-uloga{font-size:11px;font-weight:500;padding:2px 8px;border-radius:99px;white-space:nowrap;}
+.inz-proj-year{font-size:12px;color:var(--text3);font-family:var(--mono);white-space:nowrap;}
 .inz-card-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
 /* EXPORT */
 .export-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:14px;}
@@ -373,15 +390,42 @@ tbody tr:hover{background:#FAFAF8;}
 
       <!-- INŽENJERI -->
       <div class="section" id="sec-inzenjeri">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-          <div style="font-size:15px;font-weight:600;">Inženjeri</div>
-          <button class="btn btn-primary" onclick="openAddInzModal()">+ Novi inženjer</button>
+        <!-- LISTA INŽENJERA -->
+        <div id="inzListView">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <div style="font-size:15px;font-weight:600;">Inženjeri</div>
+            <button class="btn btn-primary" onclick="openAddInzModal()">+ Novi inženjer</button>
+          </div>
+          <div class="toolbar" style="margin-bottom:14px;">
+            <div class="search-wrap" style="max-width:100%;"><span class="search-icon">⌕</span><input id="searchInz" placeholder="Pretraži inženjere..." oninput="renderInzenjeri()" style="width:100%;"></div>
+          </div>
+          <div class="inz-grid" id="inzGrid"></div>
+          <div id="inzEmpty" class="empty" style="display:none;"><div class="empty-icon">◎</div><div>Dodajte prvog inženjera klikom na "+ Novi inženjer"</div></div>
         </div>
-        <div class="toolbar" style="margin-bottom:14px;">
-          <div class="search-wrap" style="max-width:100%;"><span class="search-icon">⌕</span><input id="searchInz" placeholder="Pretraži inženjere..." oninput="renderInzenjeri()" style="width:100%;"></div>
+        <!-- PROFIL INŽENJERA -->
+        <div id="inzProfileView" style="display:none;">
+          <button onclick="closeInzProfile()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:6px;">← Svi inženjeri</button>
+          <div class="inz-profile-panel">
+            <div class="inz-profile-header">
+              <div class="avatar" id="profAvatar" style="width:56px;height:56px;font-size:18px;"></div>
+              <div class="inz-profile-info">
+                <div class="inz-profile-name" id="profIme"></div>
+                <div class="inz-profile-sub" id="profObrazovanje"></div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-sm" onclick="openModalInzFromProfile()">Uredi profil</button>
+                <button class="btn btn-sm btn-gen" onclick="quickCVFromProfile()">↓ CV</button>
+              </div>
+            </div>
+            <div class="inz-profile-meta">
+              <div class="inz-profile-meta-item"><div class="inz-profile-meta-val" id="profGodine">–</div><div class="inz-profile-meta-lbl">God. iskustva</div></div>
+              <div class="inz-profile-meta-item"><div class="inz-profile-meta-val" id="profProjBroj">0</div><div class="inz-profile-meta-lbl">Projekata</div></div>
+              <div class="inz-profile-meta-item"><div class="inz-profile-meta-val" id="profValSum">–</div><div class="inz-profile-meta-lbl">Ukupno vr. radova</div></div>
+              <div class="inz-profile-meta-item" style="flex:1;"><div class="inz-profile-meta-val" id="profLicenca" style="font-size:13px;font-weight:500;">–</div><div class="inz-profile-meta-lbl">Licenca</div></div>
+            </div>
+            <div class="inz-proj-list" id="profProjList"></div>
+          </div>
         </div>
-        <div class="inz-grid" id="inzGrid"></div>
-        <div id="inzEmpty" class="empty" style="display:none;"><div class="empty-icon">◎</div><div>Dodajte prvog inženjera klikom na "+ Novi inženjer"</div></div>
       </div>
 
       <!-- GENERIRAJ -->
@@ -837,40 +881,29 @@ function renderProjekti(){
 
 function renderInzenjeri(){
   const q=(document.getElementById('searchInz')?.value||'').toLowerCase();
-  const grid=document.getElementById('inzGrid');const empty=document.getElementById('inzEmpty');
+  const grid=document.getElementById('inzGrid');
+  const empty=document.getElementById('inzEmpty');
   const list=inzenjeri.filter(i=>!q||i.toLowerCase().includes(q));
   if(!list.length){grid.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
   grid.innerHTML=list.map((ime,idx)=>{
     const[bg,fg]=avatarColor(idx);
     const profil=inzProfili[ime]||{};
-    const uloge_na_proj=projekti.flatMap(p=>getInzUloge(p).filter(u=>u.ime===ime).map(u=>({...u,naziv:p.naziv,od:p.od})));
+    const projBroj=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===ime)).length;
     const ukupnoVal=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===ime)).reduce((s,p)=>s+(Number(p.vrijednost)||0),0);
-    return`<div class="inz-card">
-      <div class="inz-card-header">
+    const aktivni=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===ime)&&p.status==='U tijeku').length;
+    return`<div class="inz-card" onclick="openInzProfile('${ime}')">
+      <div class="inz-card-arrow">→</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
         <div class="avatar" style="background:${bg};color:${fg};">${initials(ime)}</div>
-        <div>
-          <div class="inz-name">${ime}</div>
-          <div class="inz-meta">${profil.obrazovanje||'–'} · ${profil.godine_iskustva?profil.godine_iskustva+' god. isku.':'–'}</div>
-          <div class="inz-meta">${profil.licenca||''}</div>
-        </div>
+        <div><div class="inz-name">${ime}</div><div class="inz-meta">${profil.obrazovanje||'–'}</div></div>
       </div>
-      <div class="inz-projects">
-        ${(()=>{
-          // Group by project name to avoid duplicates, merge roles
-          const byProj={};
-          uloge_na_proj.forEach(u=>{
-            if(!byProj[u.naziv]) byProj[u.naziv]={...u,uloge:[]};
-            if(u.uloga) byProj[u.naziv].uloge.push(u.uloga);
-          });
-          return Object.values(byProj).slice(0,4).map(u=>`<div class="inz-proj-item"><span class="inz-proj-name">${u.naziv}</span>${u.uloge.length?`<span class="inz-proj-uloga" title="${u.uloge.join(', ')}">${u.uloge[0]}${u.uloge.length>1?' +'+( u.uloge.length-1):''}</span>`:''}<span style="font-size:11px;color:var(--text3);font-family:var(--mono);">${getYear(u.od)||''}</span></div>`).join('');
-        })()}
-        ${uloge_na_proj.length>4?`<div style="font-size:11px;color:var(--text3);padding:4px 0;">+ još ${uloge_na_proj.length-4} projekata</div>`:''}
-        ${uloge_na_proj.length===0?`<div style="font-size:12px;color:var(--text3);">Nema projekata u bazi</div>`:''}
-      </div>
-      <div class="inz-card-actions">
-        <button class="btn btn-sm" onclick="openModalInz('${ime}')">Uredi profil</button>
-        <button class="btn btn-sm btn-gen" onclick="quickCV('${ime}')">↓ CV</button>
+      ${profil.licenca?`<div style="font-size:11px;color:var(--text2);margin-bottom:10px;font-family:var(--mono);">${profil.licenca}</div>`:''}
+      <div class="inz-stat-row">
+        <div class="inz-stat"><div class="inz-stat-val">${profil.godine_iskustva||'–'}</div><div class="inz-stat-lbl">God. isku.</div></div>
+        <div class="inz-stat"><div class="inz-stat-val">${projBroj}</div><div class="inz-stat-lbl">Projekata</div></div>
+        <div class="inz-stat"><div class="inz-stat-val">${aktivni}</div><div class="inz-stat-lbl">Aktivnih</div></div>
+        <div class="inz-stat"><div class="inz-stat-val" style="font-size:13px;">${ukupnoVal>0?(ukupnoVal/1000000).toFixed(1)+'M':'–'}</div><div class="inz-stat-lbl">€ radova</div></div>
       </div>
     </div>`;
   }).join('');
