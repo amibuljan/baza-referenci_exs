@@ -8,25 +8,36 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#F5F3EE;--surface:#FFFFFF;--surface2:#EDEBE6;--border:#D8D5CE;--border-strong:#B8B4AC;--text:#1A1916;--text2:#6B6860;--text3:#9C9A94;--accent:#2D5016;--accent-light:#E8F0E0;--accent-mid:#4A7C28;--blue:#1A3A6B;--blue-light:#E0E8F5;--amber:#7A4A00;--amber-light:#FDF0D8;--red:#7A1A1A;--red-light:#F5E0E0;--purple:#4A1A7A;--purple-light:#EDE0F5;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;--radius:10px;--radius-sm:6px;}
+:root{
+  --bg:#F4F2ED;--surface:#FFFFFF;--surface2:#ECEAE4;--border:#DDD9D0;--border-strong:#B8B4AC;
+  --text:#1A1916;--text2:#6B6860;--text3:#9C9A94;
+  --accent:#3A6B1A;--accent-light:#E6F0DC;--accent-mid:#4A8C22;
+  --green-bright:#83CE00;
+  --blue:#1A3A6B;--blue-light:#E0E8F5;--amber:#7A4A00;--amber-light:#FDF0D8;
+  --red:#7A1A1A;--red-light:#F5E0E0;--purple:#4A1A7A;--purple-light:#EDE0F5;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;--radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 12px rgba(0,0,0,0.05);
+}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh;}
 .layout{display:grid;grid-template-columns:230px 1fr;min-height:100vh;}
-.sidebar{background:var(--text);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;}
-.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,0.08);}
-.firm-name{font-size:12px;font-weight:600;color:#fff;letter-spacing:0.06em;text-transform:uppercase;}
-.firm-sub{font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;font-family:var(--mono);}
-.nav{padding:14px 10px;flex:1;}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;color:rgba(255,255,255,0.45);font-size:13px;transition:all 0.15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;}
-.nav-item:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.06);}
-.nav-item.active{color:#fff;background:rgba(255,255,255,0.12);font-weight:500;}
-.sidebar-stats{padding:14px;border-top:1px solid rgba(255,255,255,0.08);display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.sidebar-stat{background:rgba(255,255,255,0.06);border-radius:var(--radius-sm);padding:9px;}
-.sidebar-stat-val{font-size:17px;font-weight:600;color:#fff;}
-.sidebar-stat-lbl{font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.05em;}
+.sidebar{background:#1C1C1A;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;}
+.sidebar-logo{padding:28px 22px 22px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.firm-name{font-size:13px;font-weight:600;color:#fff;letter-spacing:0.04em;}
+.firm-sub{font-size:11px;color:rgba(255,255,255,0.28);margin-top:3px;font-family:var(--mono);}
+.nav{padding:16px 12px;flex:1;}
+.nav-section{font-size:10px;font-weight:600;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.08em;padding:8px 12px 4px;margin-top:8px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);cursor:pointer;color:rgba(255,255,255,0.4);font-size:13px;transition:all 0.15s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left;}
+.nav-item:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.05);}
+.nav-item.active{color:#fff;background:rgba(131,206,0,0.15);font-weight:500;}
+.nav-item.active .nav-dot{background:var(--green-bright);}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:transparent;flex-shrink:0;transition:background 0.15s;}
+.sidebar-bottom{padding:16px;border-top:1px solid rgba(255,255,255,0.06);}
+.sidebar-version{font-size:11px;color:rgba(255,255,255,0.2);font-family:var(--mono);}
 .main{overflow:auto;}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
-.topbar-title{font-size:15px;font-weight:600;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 1px 0 var(--border);}
+.topbar-title{font-size:16px;font-weight:600;}
+.topbar-breadcrumb{font-size:12px;color:var(--text3);margin-top:2px;}
 .topbar-actions{display:flex;gap:8px;}
 .content{padding:24px 28px;}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius-sm);font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text);transition:all 0.15s;white-space:nowrap;}
@@ -63,6 +74,33 @@ tbody tr:hover{background:#FAFAF8;}
 .badge-eu{background:#E0EAF8;color:#1A3A6B;font-size:10px;margin-left:4px;}
 .inz-pill{display:inline-flex;align-items:center;padding:2px 7px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;font-size:11px;color:var(--text2);margin:1px;white-space:nowrap;}
 .section{display:none;}.section.active{display:block;}
+
+/* DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;position:relative;overflow:hidden;box-shadow:var(--shadow);transition:transform 0.15s,box-shadow 0.15s;}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.1);}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kpi-color,var(--accent));}
+.kpi-label{font-size:12px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;}
+.kpi-value{font-size:28px;font-weight:700;color:var(--text);line-height:1;margin-bottom:4px;}
+.kpi-sub{font-size:12px;color:var(--text3);}
+.kpi-icon{position:absolute;top:18px;right:18px;font-size:22px;opacity:0.15;}
+.dash-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;}
+.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);}
+.dash-card h3{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:16px;}
+.dash-proj-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.dash-proj-item:last-child{border-bottom:none;}
+.dash-proj-name{flex:1;font-size:13px;font-weight:500;color:var(--text);}
+.dash-proj-meta{font-size:12px;color:var(--text3);text-align:right;}
+.dash-bar-wrap{margin-bottom:12px;}
+.dash-bar-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:5px;}
+.dash-bar-track{background:var(--surface2);border-radius:99px;height:6px;overflow:hidden;}
+.dash-bar-fill{height:6px;border-radius:99px;background:var(--green-bright);transition:width 0.5s ease;}
+.dash-quick-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.dash-quick-btn{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;cursor:pointer;text-align:left;transition:all 0.15s;font-family:var(--sans);}
+.dash-quick-btn:hover{border-color:var(--accent-mid);background:var(--accent-light);}
+.dash-quick-btn-icon{font-size:20px;margin-bottom:6px;}
+.dash-quick-btn-title{font-size:13px;font-weight:600;color:var(--text);display:block;}
+.dash-quick-btn-sub{font-size:11px;color:var(--text3);}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;}
 .modal{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);width:700px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.15);}
 .modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
@@ -165,19 +203,21 @@ tbody tr:hover{background:#FAFAF8;}
   <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="firm-name" id="firmNameDisplay">Baza referenci</div>
-      <div class="firm-sub">v3.0 · referentni sustav</div>
+      <div class="firm-sub">Referentni sustav</div>
     </div>
     <nav class="nav">
-      <button class="nav-item active" onclick="switchTab('projekti',this)"><span>◫</span> Projekti</button>
-      <button class="nav-item" onclick="switchTab('inzenjeri',this)"><span>◎</span> Inženjeri</button>
-      <button class="nav-item" onclick="switchTab('generiraj',this)"><span>↓</span> Generiraj dokument</button>
-      <button class="nav-item" onclick="switchTab('export',this)"><span>↗</span> Export za natječaj</button>
-      <button class="nav-item" onclick="switchTab('postavke',this)"><span>⊙</span> Postavke</button>
+      <button class="nav-item active" onclick="switchTab('dashboard',this)"><span class="nav-dot"></span> Pregled</button>
+      <div class="nav-section">Podaci</div>
+      <button class="nav-item" onclick="switchTab('projekti',this)"><span class="nav-dot"></span> Projekti</button>
+      <button class="nav-item" onclick="switchTab('inzenjeri',this)"><span class="nav-dot"></span> Inženjeri</button>
+      <div class="nav-section">Dokumenti</div>
+      <button class="nav-item" onclick="switchTab('generiraj',this)"><span class="nav-dot"></span> Generiraj dokument</button>
+      <button class="nav-item" onclick="switchTab('export',this)"><span class="nav-dot"></span> Export za natječaj</button>
+      <div class="nav-section">Sustav</div>
+      <button class="nav-item" onclick="switchTab('postavke',this)"><span class="nav-dot"></span> Postavke</button>
     </nav>
-    <div class="sidebar-stats">
-      <div class="sidebar-stat"><div class="sidebar-stat-val" id="statProjCount">–</div><div class="sidebar-stat-lbl">Projekata</div></div>
-      <div class="sidebar-stat"><div class="sidebar-stat-val" id="statInzCount">–</div><div class="sidebar-stat-lbl">Inženjera</div></div>
-      <div class="sidebar-stat" style="grid-column:1/-1"><div class="sidebar-stat-val" id="statValSum">–</div><div class="sidebar-stat-lbl">Ukupna vrijednost radova</div></div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-version">v3.0 · referentni sustav</div>
     </div>
   </aside>
   <main class="main">
@@ -187,8 +227,48 @@ tbody tr:hover{background:#FAFAF8;}
     </div>
     <div class="content">
 
+      <!-- DASHBOARD -->
+      <div class="section active" id="sec-dashboard">
+        <div class="dash-grid" id="dashKPI"></div>
+        <div class="dash-row">
+          <div class="dash-card">
+            <h3>Zadnji projekti</h3>
+            <div id="dashRecentProj"><div class="empty" style="padding:20px 0;"><div style="font-size:13px;">Učitavanje...</div></div></div>
+          </div>
+          <div class="dash-card">
+            <h3>Usluge po tipu</h3>
+            <div id="dashTipBars"></div>
+          </div>
+        </div>
+        <div class="dash-card" style="margin-bottom:0;">
+          <h3>Brze akcije</h3>
+          <div class="dash-quick-btns">
+            <button class="dash-quick-btn" onclick="openModal()">
+              <div class="dash-quick-btn-icon">＋</div>
+              <span class="dash-quick-btn-title">Novi projekt</span>
+              <span class="dash-quick-btn-sub">Dodaj projekt u bazu referenci</span>
+            </button>
+            <button class="dash-quick-btn" onclick="switchTab('generiraj',null)">
+              <div class="dash-quick-btn-icon">↓</div>
+              <span class="dash-quick-btn-title">Generiraj dokument</span>
+              <span class="dash-quick-btn-sub">Portfelj, popis usluga ili CV</span>
+            </button>
+            <button class="dash-quick-btn" onclick="switchTab('projekti',null)">
+              <div class="dash-quick-btn-icon">◫</div>
+              <span class="dash-quick-btn-title">Pregled projekata</span>
+              <span class="dash-quick-btn-sub">Pretraži i filtriraj reference</span>
+            </button>
+            <button class="dash-quick-btn" onclick="switchTab('inzenjeri',null)">
+              <div class="dash-quick-btn-icon">◎</div>
+              <span class="dash-quick-btn-title">Profili inženjera</span>
+              <span class="dash-quick-btn-sub">Uredi profile i generiraj CV</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- PROJEKTI -->
-      <div class="section active" id="sec-projekti">
+      <div class="section" id="sec-projekti">
         <div style="margin-bottom:14px;">
           <div class="search-wrap" style="max-width:100%;margin-bottom:10px;">
             <span class="search-icon">⌕</span>
@@ -476,7 +556,7 @@ async function initApp(){
   document.getElementById('settFirma').value=cfg.firma;
   initFieldsCheck();
   await loadData();
-  renderProjekti();renderSidebarStats();populateFilters();
+  renderDashboard();populateFilters();
 }
 
 async function loadData(){
@@ -686,10 +766,7 @@ function renderExport(){
 function copyExport(){const out=document.getElementById('exportResult');if(!out._raw){showToast('Nema podataka');return;}navigator.clipboard?.writeText(out._raw).then(()=>showToast('Tablica kopirana!')).catch(()=>showToast('Označite tekst ručno'));}
 
 function renderSidebarStats(){
-  document.getElementById('statProjCount').textContent=projekti.length;
-  document.getElementById('statInzCount').textContent=inzenjeri.length;
-  const sum=projekti.reduce((s,p)=>s+(Number(p.vrijednost)||0),0);
-  document.getElementById('statValSum').textContent=(sum/1000000).toFixed(1)+' M€';
+  if(document.getElementById('sec-dashboard')?.classList.contains('active')) renderDashboard();
 }
 
 function renderInzSettings(){
@@ -947,14 +1024,86 @@ async function callGenerateAPI(tip, data){
 }
 
 function switchTab(name,btn){
-  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  else {
+    // Find and activate correct nav item
+    document.querySelectorAll('.nav-item').forEach(b=>{
+      if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+name+"'")) b.classList.add('active');
+    });
+  }
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');
-  const titles={projekti:'Projekti',inzenjeri:'Inženjeri',generiraj:'Generiraj dokument',export:'Export za natječaj',postavke:'Postavke'};
+  const titles={dashboard:'Pregled',projekti:'Projekti',inzenjeri:'Inženjeri',generiraj:'Generiraj dokument',export:'Export za natječaj',postavke:'Postavke'};
   document.getElementById('topbarTitle').textContent=titles[name]||name;
   const actEl=document.getElementById('topbarActions');
-  actEl.innerHTML=name==='projekti'?'<button class="btn btn-primary" onclick="openModal()">+ Novi projekt</button>':'';
-  if(name==='inzenjeri')renderInzenjeri();if(name==='export')renderExport();if(name==='postavke')renderInzSettings();
+  actEl.innerHTML=name==='projekti'?'<button class="btn btn-primary" onclick="openModal()">+ Novi projekt</button>':
+    name==='dashboard'?'<button class="btn btn-primary" onclick="openModal()">+ Novi projekt</button>':'';
+  if(name==='dashboard')renderDashboard();
+  if(name==='inzenjeri')renderInzenjeri();
+  if(name==='export')renderExport();
+  if(name==='postavke')renderInzSettings();
+}
+
+function renderDashboard(){
+  const ukupnoVal=projekti.reduce((s,p)=>s+(Number(p.vrijednost)||0),0);
+  const ukupnoUsl=projekti.reduce((s,p)=>s+(Number(p.vrijednost_usluge)||0),0);
+  const aktivni=projekti.filter(p=>p.status==='U tijeku').length;
+  const zavrseni=projekti.filter(p=>p.status==='Završeno').length;
+  const euProj=projekti.filter(p=>p.eu_sufinanciranje).length;
+
+  document.getElementById('dashKPI').innerHTML=`
+    <div class="kpi-card" style="--kpi-color:#83CE00;">
+      <div class="kpi-label">Ukupno projekata</div>
+      <div class="kpi-value">${projekti.length}</div>
+      <div class="kpi-sub">${aktivni} aktivnih · ${zavrseni} završenih</div>
+      <div class="kpi-icon">◫</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:#1A3A6B;">
+      <div class="kpi-label">Vrijednost radova</div>
+      <div class="kpi-value">${(ukupnoVal/1000000).toFixed(1)}<span style="font-size:16px;font-weight:400;color:var(--text3);"> M€</span></div>
+      <div class="kpi-sub">kumulativno u bazi</div>
+      <div class="kpi-icon">€</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:#4A7C28;">
+      <div class="kpi-label">Vrijednost usluga</div>
+      <div class="kpi-value">${(ukupnoUsl/1000000).toFixed(2)}<span style="font-size:16px;font-weight:400;color:var(--text3);"> M€</span></div>
+      <div class="kpi-sub">naplaćenih konzultantskih usluga</div>
+      <div class="kpi-icon">◎</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:#7A4A00;">
+      <div class="kpi-label">EU projekti</div>
+      <div class="kpi-value">${euProj}</div>
+      <div class="kpi-sub">${projekti.length?Math.round(euProj/projekti.length*100):0}% portfelja</div>
+      <div class="kpi-icon">★</div>
+    </div>`;
+
+  // Recent projects
+  const recent=[...projekti].sort((a,b)=>(b.od||'').localeCompare(a.od||'')).slice(0,5);
+  document.getElementById('dashRecentProj').innerHTML=recent.length?recent.map(p=>`
+    <div class="dash-proj-item">
+      <span class="badge badge-${badgeClass(p.tip).split('-')[2]||'nadzor'}" style="flex-shrink:0;">${p.tip}</span>
+      <div style="flex:1;min-width:0;">
+        <div class="dash-proj-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.naziv}</div>
+        <div style="font-size:11px;color:var(--text3);">${p.investitor||'–'}</div>
+      </div>
+      <div class="dash-proj-meta">
+        <div>${fmtVal(p.vrijednost)}</div>
+        <div>${fmtDate(p.od)||'–'}</div>
+      </div>
+    </div>`).join(''):'<div style="color:var(--text3);font-size:13px;padding:20px 0;">Nema projekata u bazi.</div>';
+
+  // Type bars
+  const tipovi=['Stručni nadzor','Vođenje projekta','Projektiranje','Konzultantske usluge'];
+  const max=Math.max(...tipovi.map(t=>projekti.filter(p=>p.tip===t).length),1);
+  document.getElementById('dashTipBars').innerHTML=tipovi.map(t=>{
+    const cnt=projekti.filter(p=>p.tip===t).length;
+    const pct=Math.round(cnt/max*100);
+    return`<div class="dash-bar-wrap">
+      <div class="dash-bar-label"><span>${t}</span><span>${cnt} projekata</span></div>
+      <div class="dash-bar-track"><div class="dash-bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
 }
 
 initApp();
