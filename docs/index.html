@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORDO · Referentni sustav</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#F4F2ED;--surface:#FFFFFF;--surface2:#ECEAE4;--border:#DDD9D0;--border-strong:#B8B4AC;
+  --text:#1A1916;--text2:#6B6860;--text3:#9C9A94;
+  --accent:#3A6B1A;--accent-light:#E6F0DC;--accent-mid:#4A8C22;
+  --green-bright:#83CE00;
+  --blue:#1A3A6B;--blue-light:#E0E8F5;--amber:#7A4A00;--amber-light:#FDF0D8;
+  --red:#7A1A1A;--red-light:#F5E0E0;--purple:#4A1A7A;--purple-light:#EDE0F5;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;--radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 12px rgba(0,0,0,0.05);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh;}
+.layout{display:grid;grid-template-columns:230px 1fr;min-height:100vh;}
+.sidebar{background:#1C1C1A;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;}
+.sidebar-logo{padding:28px 22px 22px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.firm-name{font-size:13px;font-weight:600;color:#fff;letter-spacing:0.04em;}
+.firm-sub{font-size:11px;color:rgba(255,255,255,0.28);margin-top:3px;font-family:var(--mono);}
+.nav{padding:16px 12px;flex:1;}
+.nav-section{font-size:10px;font-weight:600;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.08em;padding:8px 12px 4px;margin-top:8px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);cursor:pointer;color:rgba(255,255,255,0.4);font-size:13px;transition:all 0.15s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left;}
+.nav-item:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.05);}
+.nav-item.active{color:#fff;background:rgba(131,206,0,0.15);font-weight:500;}
+.nav-item.active .nav-dot{background:var(--green-bright);}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:transparent;flex-shrink:0;transition:background 0.15s;}
+.sidebar-bottom{padding:16px;border-top:1px solid rgba(255,255,255,0.06);}
+.sidebar-version{font-size:11px;color:rgba(255,255,255,0.2);font-family:var(--mono);}
+.main{overflow:auto;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 1px 0 var(--border);}
+.topbar-title{font-size:16px;font-weight:600;}
+.topbar-breadcrumb{font-size:12px;color:var(--text3);margin-top:2px;}
+.topbar-actions{display:flex;gap:8px;}
+.content{padding:24px 28px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius-sm);font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text);transition:all 0.15s;white-space:nowrap;}
+.btn:hover{background:var(--surface2);border-color:var(--border-strong);}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn-primary:hover{background:var(--accent-mid);}
+.btn-sm{padding:3px 9px;font-size:12px;}
+.btn-danger{color:var(--red);border-color:#E8C0C0;}
+.btn-danger:hover{background:var(--red-light);}
+.btn-gen{background:var(--blue);color:#fff;border-color:var(--blue);font-size:12px;padding:4px 10px;}
+.btn-gen:hover{opacity:0.85;}
+.toolbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+.search-wrap{position:relative;flex:1;min-width:180px;max-width:300px;}
+.search-wrap input{padding-left:30px;width:100%;}
+.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;}
+input,select,textarea{font-family:var(--sans);font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);outline:none;transition:border 0.15s;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent-mid);}
+textarea{resize:vertical;min-height:60px;}
+.table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--surface2);}
+th{text-align:left;padding:9px 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);white-space:nowrap;border-bottom:1px solid var(--border);}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:#FAFAF8;}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500;white-space:nowrap;}
+.badge-nadzor{background:var(--blue-light);color:var(--blue);}
+.badge-vodenje{background:var(--accent-light);color:var(--accent);}
+.badge-projektiranje{background:var(--purple-light);color:var(--purple);}
+.badge-kombinacija{background:#E0F0F8;color:#1A5A6B;}
+.badge-zavrseno{background:#E8F5E0;color:var(--accent);}
+.badge-u-tijeku{background:var(--blue-light);color:var(--blue);}
+.badge-eu{background:#E0EAF8;color:#1A3A6B;font-size:10px;margin-left:4px;}
+.inz-pill{display:inline-flex;align-items:center;padding:2px 7px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;font-size:11px;color:var(--text2);margin:1px;white-space:nowrap;}
+.section{display:none;}.section.active{display:block;}
+
+/* DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;position:relative;overflow:hidden;box-shadow:var(--shadow);transition:transform 0.15s,box-shadow 0.15s;}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.1);}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kpi-color,var(--accent));}
+.kpi-label{font-size:12px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;}
+.kpi-value{font-size:28px;font-weight:700;color:var(--text);line-height:1;margin-bottom:4px;}
+.kpi-sub{font-size:12px;color:var(--text3);}
+.kpi-icon{position:absolute;top:18px;right:18px;font-size:22px;opacity:0.15;}
+.dash-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;}
+.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);}
+.dash-card h3{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:16px;}
+.dash-proj-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.dash-proj-item:last-child{border-bottom:none;}
+.dash-proj-name{flex:1;font-size:13px;font-weight:500;color:var(--text);}
+.dash-proj-meta{font-size:12px;color:var(--text3);text-align:right;}
+.dash-bar-wrap{margin-bottom:12px;}
+.dash-bar-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:5px;}
+.dash-bar-track{background:var(--surface2);border-radius:99px;height:6px;overflow:hidden;}
+.dash-bar-fill{height:6px;border-radius:99px;background:var(--green-bright);transition:width 0.5s ease;}
+.dash-quick-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.dash-quick-btn{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;cursor:pointer;text-align:left;transition:all 0.15s;font-family:var(--sans);}
+.dash-quick-btn:hover{border-color:var(--accent-mid);background:var(--accent-light);}
+.dash-quick-btn-icon{font-size:20px;margin-bottom:6px;}
+.dash-quick-btn-title{font-size:13px;font-weight:600;color:var(--text);display:block;}
+.dash-quick-btn-sub{font-size:11px;color:var(--text3);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);width:700px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.15);}
+.modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-header h2{font-size:15px;font-weight:600;}
+.modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text3);padding:2px 6px;border-radius:4px;}
+.modal-body{padding:18px 22px;}
+.modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+.form-section{margin-bottom:18px;}
+.form-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.form-full{grid-column:1/-1;}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-group label{font-size:12px;font-weight:500;color:var(--text2);}
+.form-group input,.form-group select,.form-group textarea{width:100%;}
+.toggle-row{display:flex;align-items:center;gap:10px;padding:8px 0;}
+.toggle{position:relative;width:38px;height:22px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:99px;cursor:pointer;transition:0.2s;}
+.toggle-slider:before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:white;border-radius:50%;transition:0.2s;}
+.toggle input:checked+.toggle-slider{background:var(--accent);}
+.toggle input:checked+.toggle-slider:before{transform:translateX(16px);}
+.toggle-label{font-size:13px;font-weight:500;}
+.inz-uloge-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);}
+.inz-uloga-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center;padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);}
+.inz-uloga-name{font-size:13px;font-weight:500;}
+.inz-uloga-select{font-size:12px;padding:4px 8px;}
+/* INŽENJERI PROFILI */
+.inz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;}
+.inz-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:border-color 0.15s;}
+.inz-card:hover{border-color:var(--border-strong);}
+.inz-card-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+.inz-name{font-weight:600;font-size:14px;}
+.inz-meta{font-size:12px;color:var(--text3);}
+.inz-projects{display:flex;flex-direction:column;gap:4px;}
+.inz-proj-item{display:flex;align-items:center;gap:6px;padding:5px 7px;background:var(--bg);border-radius:var(--radius-sm);font-size:12px;}
+.inz-proj-name{flex:1;}
+.inz-proj-uloga{font-size:11px;color:var(--accent);font-weight:500;background:var(--accent-light);padding:1px 6px;border-radius:99px;white-space:nowrap;}
+.inz-card-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+/* EXPORT */
+.export-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:14px;}
+.export-card h3{font-size:13px;font-weight:600;margin-bottom:12px;}
+.export-output{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-family:var(--mono);font-size:11px;white-space:pre;overflow-x:auto;max-height:380px;overflow-y:auto;color:var(--text2);line-height:1.7;}
+/* GENERIRAJ */
+.gen-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:14px;}
+.gen-card h3{font-size:14px;font-weight:600;margin-bottom:6px;}
+.gen-card p{font-size:13px;color:var(--text2);margin-bottom:14px;}
+.gen-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.gen-option{display:flex;flex-direction:column;gap:4px;}
+.gen-option label{font-size:12px;font-weight:500;color:var(--text2);}
+.gen-option input,.gen-option select,.gen-option textarea{width:100%;font-size:13px;}
+.gen-option textarea{height:50px;}
+.fields-check{display:flex;flex-wrap:wrap;gap:6px;}
+.field-pill{display:flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid var(--border);border-radius:99px;font-size:12px;cursor:pointer;user-select:none;background:var(--surface);transition:all 0.15s;}
+.field-pill:hover{border-color:var(--accent-mid);background:var(--accent-light);color:var(--accent);}
+.field-pill input{display:none;}
+.field-pill.checked{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500;}
+.field-pill.checked:hover{background:var(--accent-mid);border-color:var(--accent-mid);}
+/* SETTINGS */
+.settings-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:14px;}
+.settings-section h3{font-size:11px;font-weight:600;margin-bottom:14px;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;}
+.inz-list-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.inz-list-item:last-child{border-bottom:none;}
+.empty{text-align:center;padding:48px 20px;color:var(--text3);}
+.empty-icon{font-size:28px;margin-bottom:8px;}
+.loading{text-align:center;padding:40px;color:var(--text3);font-family:var(--mono);font-size:12px;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:10px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;z-index:999;opacity:0;transform:translateY(8px);transition:all 0.2s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.config-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px;}
+.config-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px;width:500px;max-width:100%;}
+.config-card h1{font-size:20px;font-weight:600;margin-bottom:6px;}
+.config-card .sub{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.6;}
+.config-step{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:8px;font-size:13px;}
+.config-step strong{display:block;font-weight:600;margin-bottom:2px;}
+.config-inputs{margin:18px 0;display:flex;flex-direction:column;gap:10px;}
+@media(max-width:768px){.layout{grid-template-columns:1fr;}.sidebar{height:auto;position:static;}.content{padding:16px;}.form-grid,.form-grid-3{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div id="configScreen" class="config-screen" style="display:flex;">
+  <div class="config-card">
+    <h1>Dobrodošli u ORDO</h1>
+    <p class="sub">ORDO — referentni sustav za građevinske konzultante. Unesite podatke za spajanje na bazu. Ovo je potrebno samo jednom po uređaju.</p>
+    <div class="config-step"><strong>Supabase Project URL</strong>Settings → API → Project URL</div>
+    <div class="config-step"><strong>Supabase Anon Key</strong>Settings → API → anon public key (počinje s eyJ...)</div>
+    <div class="config-inputs">
+      <div class="form-group"><label>Supabase Project URL</label><input id="cfgUrl" placeholder="https://xxxx.supabase.co"></div>
+      <div class="form-group"><label>Supabase Anon Key</label><input id="cfgKey" placeholder="eyJhbGci..."></div>
+      <div class="form-group"><label>Naziv firme</label><input id="cfgFirma" placeholder="npr. Exstructa d.o.o."></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="saveConfig()">Spoji na bazu →</button>
+    <p style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center;">Podaci se čuvaju lokalno u vašem browseru</p>
+  </div>
+</div>
+
+<div id="appRoot" style="display:none;">
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="firm-name" id="firmNameDisplay">Baza referenci</div>
+      <div class="firm-sub">ORDO · referentni sustav</div>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" onclick="switchTab('dashboard',this)"><span class="nav-dot"></span> Pregled</button>
+      <div class="nav-section">Podaci</div>
+      <button class="nav-item" onclick="switchTab('projekti',this)"><span class="nav-dot"></span> Projekti</button>
+      <button class="nav-item" onclick="switchTab('inzenjeri',this)"><span class="nav-dot"></span> Inženjeri</button>
+      <div class="nav-section">Dokumenti</div>
+      <button class="nav-item" onclick="switchTab('generiraj',this)"><span class="nav-dot"></span> Generiraj dokument</button>
+      <button class="nav-item" onclick="switchTab('export',this)"><span class="nav-dot"></span> Export za natječaj</button>
+      <div class="nav-section">Sustav</div>
+      <button class="nav-item" onclick="switchTab('postavke',this)"><span class="nav-dot"></span> Postavke</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="sidebar-version">ORDO v1.0</div>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Projekti</div>
+      <div class="topbar-actions" id="topbarActions"><button class="btn btn-primary" onclick="openModal()">+ Novi projekt</button></div>
+    </div>
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="section active" id="sec-dashboard">
+        <div class="dash-grid" id="dashKPI"></div>
+        <div class="dash-row">
+          <div class="dash-card">
+            <h3>Zadnji projekti</h3>
+            <div id="dashRecentProj"><div class="empty" style="padding:20px 0;"><div style="font-size:13px;">Učitavanje...</div></div></div>
+          </div>
+          <div class="dash-card">
+            <h3>Usluge po tipu</h3>
+            <div id="dashTipBars"></div>
+          </div>
+        </div>
+        <div class="dash-card" style="margin-bottom:0;">
+          <h3>Brze akcije</h3>
+          <div class="dash-quick-btns">
+            <button class="dash-quick-btn" onclick="openModal()">
+              <div class="dash-quick-btn-icon">＋</div>
+              <span class="dash-quick-btn-title">Novi projekt</span>
+              <span class="dash-quick-btn-sub">Dodaj projekt u bazu referenci</span>
+            </button>
+            <button class="dash-quick-btn" onclick="switchTab('generiraj',null)">
+              <div class="dash-quick-btn-icon">↓</div>
+              <span class="dash-quick-btn-title">Generiraj dokument</span>
+              <span class="dash-quick-btn-sub">Portfelj, popis usluga ili CV</span>
+            </button>
+            <button class="dash-quick-btn" onclick="switchTab('projekti',null)">
+              <div class="dash-quick-btn-icon">◫</div>
+              <span class="dash-quick-btn-title">Pregled projekata</span>
+              <span class="dash-quick-btn-sub">Pretraži i filtriraj reference</span>
+            </button>
+            <button class="dash-quick-btn" onclick="switchTab('inzenjeri',null)">
+              <div class="dash-quick-btn-icon">◎</div>
+              <span class="dash-quick-btn-title">Profili inženjera</span>
+              <span class="dash-quick-btn-sub">Uredi profile i generiraj CV</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJEKTI -->
+      <div class="section" id="sec-projekti">
+        <div style="margin-bottom:14px;">
+          <div class="search-wrap" style="max-width:100%;margin-bottom:10px;">
+            <span class="search-icon">⌕</span>
+            <input id="search" placeholder="Pretraži po nazivu, lokaciji, investitoru, kategoriji..." oninput="renderProjekti()" style="width:100%;">
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <select id="filterTip" onchange="renderProjekti()" style="flex:1;min-width:140px;"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
+            <select id="filterStatus" onchange="renderProjekti()" style="flex:1;min-width:110px;"><option value="">Svi statusi</option><option>U tijeku</option><option>Završeno</option></select>
+            <select id="filterKat" onchange="renderProjekti()" style="flex:1;min-width:140px;"><option value="">Sve kategorije</option></select>
+            <select id="filterInz" onchange="renderProjekti()" style="flex:1;min-width:140px;"><option value="">Svi inženjeri</option></select>
+            <select id="filterGod" onchange="renderProjekti()" style="flex:1;min-width:110px;"><option value="">Sve godine</option></select>
+            <select id="filterEU" onchange="renderProjekti()" style="flex:1;min-width:110px;"><option value="">EU i ostalo</option><option value="true">EU projekti</option><option value="false">Bez EU</option></select>
+            <input id="filterMinVr" type="number" placeholder="Min. vr. radova (€)" style="flex:1;min-width:160px;" oninput="renderProjekti()">
+            <input id="filterMinUs" type="number" placeholder="Min. vr. usluge (€)" style="flex:1;min-width:155px;" oninput="renderProjekti()">
+            <button class="btn btn-sm" onclick="clearFilters()" style="white-space:nowrap;flex-shrink:0;">✕ Očisti</button>
+          </div>
+        </div>
+        <div class="table-card">
+          <div class="table-wrap">
+            <table><thead><tr>
+              <th>Naziv projekta</th>
+              <th onclick="sortBy('kategorija')" style="cursor:pointer;" id="th_kategorija">Kategorija <span id="si_kategorija"></span></th>
+              <th>Tip</th>
+              <th onclick="sortBy('status')" style="cursor:pointer;" id="th_status">Status <span id="si_status"></span></th>
+              <th onclick="sortBy('vrijednost')" style="cursor:pointer;" id="th_vrijednost">Vr. radova <span id="si_vrijednost"></span></th>
+              <th onclick="sortBy('vrijednost_usluge')" style="cursor:pointer;" id="th_vrijednost_usluge">Vr. usluge <span id="si_vrijednost_usluge"></span></th>
+              <th>Investitor</th>
+              <th onclick="sortBy('od')" style="cursor:pointer;" id="th_od">Trajanje <span id="si_od"></span></th>
+              <th>Inženjeri</th><th></th></tr></thead>
+            <tbody id="tableBody"></tbody></table>
+          </div>
+          <div id="tableEmpty" class="empty" style="display:none;"><div class="empty-icon">◻</div><div>Nema projekata prema odabranim filterima</div></div>
+          <div id="tableLoading" class="loading">Učitavanje...</div>
+        </div>
+      </div>
+
+      <!-- INŽENJERI -->
+      <div class="section" id="sec-inzenjeri">
+        <div class="toolbar">
+          <div class="search-wrap"><span class="search-icon">⌕</span><input id="searchInz" placeholder="Pretraži inženjere..." oninput="renderInzenjeri()"></div>
+        </div>
+        <div class="inz-grid" id="inzGrid"></div>
+        <div id="inzEmpty" class="empty" style="display:none;"><div class="empty-icon">◎</div><div>Dodajte inženjere u Postavkama</div></div>
+      </div>
+
+      <!-- GENERIRAJ -->
+      <div class="section" id="sec-generiraj">
+
+        <!-- PORTFELJ -->
+        <div class="gen-card">
+          <h3>Portfelj projekata</h3>
+          <p>Generiraj Word dokument s odabranim projektima u Exstructa stilu.</p>
+          <div class="gen-options">
+            <div class="gen-option"><label>Tip usluge (filter)</label>
+              <select id="genTip"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
+            </div>
+            <div class="gen-option"><label>Od godine</label><input id="genOdGod" type="number" placeholder="npr. 2020" min="2000" max="2030"></div>
+            <div class="gen-option" style="grid-column:1/-1;"><label>Polja za prikaz</label>
+              <div class="fields-check" id="fieldsCheck"></div>
+            </div>
+            <div class="gen-option"><label>Naslov dokumenta</label><input id="genNaslov" placeholder="Portfelj projekata"></div>
+          </div>
+          <button class="btn btn-primary" onclick="genPortfelj()">↓ Preuzmi Word portfelj</button>
+        </div>
+
+        <!-- POPIS USLUGA -->
+        <div class="gen-card">
+          <h3>Popis izvršenih usluga</h3>
+          <p>Generiraj obrazac popisa usluga za natječaj (landscape memorandum, 5 stupaca).</p>
+          <div class="gen-options">
+            <div class="gen-option" style="grid-column:1/-1;"><label>Naziv naručitelja *</label><input id="pisNarucitelj" placeholder="MINISTARSTVO PRAVOSUĐA, UPRAVE I DIGITALNE TRANSFORMACIJE"></div>
+            <div class="gen-option" style="grid-column:1/-1;"><label>Adresa naručitelja</label><input id="pisAdrNar" placeholder="Ulica grada Vukovara 49, 10000 Grad Zagreb"></div>
+            <div class="gen-option" style="grid-column:1/-1;"><label>Predmet nabave *</label><input id="pisPredmet" placeholder="Usluga stručnog nadzora..."></div>
+            <div class="gen-option"><label>Evidencijski broj nabave</label><input id="pisEvBroj" placeholder="npr. 112/24"></div>
+            <div class="gen-option"><label>Filter – tip usluge</label>
+              <select id="pisTip"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
+            </div>
+            <div class="gen-option"><label>Od godine</label><input id="pisOdGod" type="number" placeholder="npr. 2022" min="2000" max="2030"></div>
+            <div class="gen-option"><label>Grad (za potpis)</label><input id="pisGrad" placeholder="Zagreb" value="Zagreb"></div>
+          </div>
+          <button class="btn btn-primary" onclick="genPopis()">↓ Preuzmi popis usluga</button>
+        </div>
+
+        <!-- CV -->
+        <div class="gen-card">
+          <h3>CV stručnjaka</h3>
+          <p>Generiraj životopis inženjera s relevantnim projektima iz baze.</p>
+          <div class="gen-options">
+            <div class="gen-option"><label>Inženjer *</label>
+              <select id="cvInz"><option value="">— odaberi inženjera —</option></select>
+            </div>
+            <div class="gen-option"><label>Pozicija na natječaju *</label><input id="cvPozicija" placeholder="npr. Glavni nadzorni inženjer"></div>
+            <div class="gen-option"><label>Filter – tip projekata</label>
+              <select id="cvTip"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
+            </div>
+            <div class="gen-option"><label>Od godine</label><input id="cvOdGod" type="number" placeholder="npr. 2020" min="2000" max="2030"></div>
+          </div>
+          <button class="btn btn-primary" onclick="genCV()">↓ Preuzmi CV</button>
+        </div>
+      </div>
+
+      <!-- EXPORT TABLICA -->
+      <div class="section" id="sec-export">
+        <div class="export-card">
+          <h3>Filtri za natječaj</h3>
+          <div class="toolbar" style="margin-bottom:0;">
+            <select id="expTip" onchange="renderExport()"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
+            <select id="expStatus" onchange="renderExport()"><option value="">Svi statusi</option><option>U tijeku</option><option>Završeno</option></select>
+            <select id="expInz" onchange="renderExport()"><option value="">Svi inženjeri</option></select>
+            <select id="expEU" onchange="renderExport()"><option value="">EU i ostalo</option><option value="true">Samo EU</option><option value="false">Bez EU</option></select>
+            <input id="expMinVal" type="number" placeholder="Min. vr. radova (€)" style="width:170px;" oninput="renderExport()">
+            <input id="expOdGod" type="number" placeholder="Od godine" style="width:110px;" oninput="renderExport()">
+            <button class="btn btn-primary" onclick="copyExport()">Kopiraj tablicu</button>
+          </div>
+        </div>
+        <div id="exportResult"></div>
+      </div>
+
+      <!-- POSTAVKE -->
+      <div class="section" id="sec-postavke">
+        <div class="settings-section">
+          <h3>Inženjeri</h3>
+          <div style="display:flex;gap:8px;margin-bottom:14px;"><input id="newInzName" placeholder="Ime i prezime" style="flex:1;"><button class="btn btn-primary" onclick="addInzenjer()">Dodaj</button></div>
+          <div id="inzListSettings"></div>
+        </div>
+        <div class="settings-section">
+          <h3>Konfiguracija</h3>
+          <div class="form-group" style="margin-bottom:12px;"><label>Naziv firme</label><input id="settFirma"></div>
+          <button class="btn btn-primary" onclick="saveFirmaName()">Spremi naziv</button>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);"><button class="btn btn-danger" onclick="resetConfig()">Resetiraj konfiguraciju</button></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+</div>
+
+<!-- MODAL PROJEKT -->
+<div id="modal" style="display:none;">
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-header"><h2 id="modalTitle">Novi projekt</h2><button class="modal-close" onclick="closeModal()">✕</button></div>
+      <div class="modal-body">
+        <div class="form-section">
+          <div class="form-section-title">Osnovni podaci</div>
+          <div class="form-grid">
+            <div class="form-group form-full"><label>Naziv projekta *</label><input id="fNaziv" placeholder="Puni naziv projekta"></div>
+            <div class="form-group"><label>Lokacija *</label><input id="fLokacija" placeholder="npr. Zagreb"></div>
+            <div class="form-group"><label>Kategorija / vrsta objekta</label><input id="fKategorija" placeholder="npr. Zgrada javne namjene"></div>
+            <div class="form-group"><label>Tip usluge *</label><select id="fTip"><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select></div>
+            <div class="form-group"><label>Uloga firme</label><input id="fUlogaFirme" placeholder="npr. Stručni nadzor i koordinator ZNR"></div>
+            <div class="form-group"><label>Status</label><select id="fStatus"><option>U tijeku</option><option>Završeno</option></select></div>
+            <div class="form-group"><label>Broj ugovora</label><input id="fBrojUgovora" placeholder="npr. KLASA: 406-02/22-01/66"></div>
+            <div class="form-group form-full"><div class="toggle-row"><label class="toggle"><input type="checkbox" id="fEU"><span class="toggle-slider"></span></label><span class="toggle-label">Projekt sufinanciran sredstvima EU</span></div></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Financije i dimenzije</div>
+          <div class="form-grid-3">
+            <div class="form-group"><label>Vrijednost radova (€)</label><input id="fVrijednost" type="number" placeholder="1500000"></div>
+            <div class="form-group"><label>Vrijednost usluge (€)</label><input id="fVrijednostUsluge" type="number" placeholder="85000"></div>
+            <div class="form-group"></div>
+            <div class="form-group"><label>Površina objekta (m²)</label><input id="fPovrsina" type="number" placeholder="2500"></div>
+            <div class="form-group"><label>Dužina trase (km)</label><input id="fDuzina" type="number" step="0.01" placeholder="12.5"></div>
+            <div class="form-group"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Investitor i trajanje</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Investitor / naručitelj</label><input id="fInvestitor" placeholder="npr. Ministarstvo pravosuđa i uprave"></div>
+            <div class="form-group"><label>Adresa investitora</label><input id="fInvestitorAdresa" placeholder="npr. Ulica grada Vukovara 49, Zagreb"></div>
+            <div class="form-group"><label>Kontakt osoba</label><input id="fKontaktOsoba" placeholder="npr. Mirela Moštak, Voditeljica projekta"></div>
+            <div class="form-group"><label>Kontakt e-mail</label><input id="fKontaktEmail" placeholder="npr. mirela.mostak@mpu.hr"></div>
+            <div class="form-group"><label>Kontakt telefon</label><input id="fKontaktTel" placeholder="npr. +385 (0)1 3714-678"></div>
+            <div class="form-group"></div>
+            <div class="form-group"><label>Datum početka</label><input id="fOd" type="month"></div>
+            <div class="form-group"><label>Datum završetka</label><input id="fDo" type="month"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Inženjeri i uloge na projektu</div>
+          <div class="inz-uloge-list" id="inzUlogeList"></div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Opisi</div>
+          <div class="form-grid">
+            <div class="form-group form-full"><label>Opis radova za natječaj (svaki red = jedna stavka)</label><textarea id="fOpisRadova" placeholder="Rekonstrukcija fasade&#10;Zamjena prozora&#10;Obnova krovišta..." style="height:80px;"></textarea></div>
+            <div class="form-group form-full"><label>Napomena / opis projekta (za portfelj)</label><textarea id="fNapomena" placeholder="Kratki opis projekta za portfelj..."></textarea></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal()">Odustani</button>
+        <button class="btn btn-danger btn-sm" id="btnDelete" style="margin-right:auto;display:none;" onclick="deleteProject()">Obriši projekt</button>
+        <button class="btn btn-primary" onclick="saveProject()">Spremi projekt</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INŽENJER PROFIL -->
+<div id="modalInz" style="display:none;">
+  <div class="modal-overlay" onclick="if(event.target===this)closeModalInz()">
+    <div class="modal" style="width:520px;">
+      <div class="modal-header"><h2 id="modalInzTitle">Profil inženjera</h2><button class="modal-close" onclick="closeModalInz()">✕</button></div>
+      <div class="modal-body">
+        <div class="form-section">
+          <div class="form-section-title">Osobni podaci</div>
+          <div class="form-grid">
+            <div class="form-group form-full"><label>Ime i prezime</label><input id="iIme" disabled style="background:var(--surface2);"></div>
+            <div class="form-group form-full"><label>Struka i razina obrazovanja</label><input id="iObrazovanje" placeholder="npr. Diplomirani inženjer građevinarstva"></div>
+            <div class="form-group"><label>Godine iskustva</label><input id="iGodine" type="number" placeholder="npr. 15" min="0" max="50"></div>
+            <div class="form-group"><label>Licenca / strukovni broj</label><input id="iLicenca" placeholder="npr. G 1234"></div>
+            <div class="form-group"><label>E-mail</label><input id="iEmail" type="email" placeholder="npr. ime.prezime@exstructa.hr"></div>
+            <div class="form-group"><label>Telefon</label><input id="iTelefon" placeholder="npr. 099 123 4567"></div>
+            <div class="form-group form-full"><label>Napomena</label><textarea id="iNapomena" placeholder="Posebne kompetencije, certifikati..."></textarea></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModalInz()">Odustani</button>
+        <button class="btn btn-primary" onclick="saveInzProfil()">Spremi profil</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const AVATAR_COLORS=[['#E8F0E0','#2D5016'],['#E0E8F5','#1A3A6B'],['#EDE0F5','#4A1A7A'],['#FDF0D8','#7A4A00'],['#F5E0E0','#7A1A1A'],['#E0F5F0','#1A6B5A'],['#F5E8F0','#6B1A4A'],['#F0F0E0','#4A4A16']];
+const ULOGE=[
+  'Glavni nadzorni inženjer',
+  'FIDIC Inženjer',
+  'Nadzorni inženjer za građevinske radove',
+  'Nadzorni inženjer za strojarske radove',
+  'Nadzorni inženjer za obrtničke radove',
+  'Voditelj projekta',
+  'Pomoćnik voditelja projekta',
+  'Zamjenik voditelja projekta',
+  'Stručnjak za EU sufinanciranje',
+  'Građevinski stručnjak',
+  'Konzultant',
+  'Projektant',
+  'Suradnik projektanta',
+];
+const FIELDS_DEF=[
+  {id:'kategorija',label:'Kategorija'},
+  {id:'uloga',label:'Vrsta usluge'},
+  {id:'trajanje',label:'Trajanje'},
+  {id:'status',label:'Status'},
+  {id:'investitor',label:'Naručitelj'},
+  {id:'vrijednost',label:'Vr. radova'},
+  {id:'usluga',label:'Vr. usluge'},
+  {id:'povrsina',label:'Površina (m²)'},
+  {id:'eu',label:'EU'},
+  {id:'tim',label:'Tim stručnjaka'},
+  {id:'ugovor',label:'Br. ugovora'},
+  {id:'opis',label:'Opis projekta'},
+];
+
+let sbClient=null,projekti=[],inzenjeri=[],inzProfili={},editId=null,editInzIme=null;
+let sortField=null,sortDir=1; // sortDir: 1=asc, -1=desc
+
+function loadConfig(){return{url:localStorage.getItem('sb_url'),key:localStorage.getItem('sb_key'),firma:localStorage.getItem('sb_firma')||'Baza referenci'};}
+function saveConfig(){
+  const url=document.getElementById('cfgUrl').value.trim();
+  const key=document.getElementById('cfgKey').value.trim();
+  const firma=document.getElementById('cfgFirma').value.trim();
+  if(!url||!key){showToast('Unesite URL i Key!');return;}
+  localStorage.setItem('sb_url',url);localStorage.setItem('sb_key',key);localStorage.setItem('sb_firma',firma||'Baza referenci');
+  initApp();
+}
+function resetConfig(){if(!confirm('Resetirati?'))return;localStorage.removeItem('sb_url');localStorage.removeItem('sb_key');location.reload();}
+
+async function initApp(){
+  const cfg=loadConfig();
+  if(!cfg.url||!cfg.key){document.getElementById('configScreen').style.display='flex';document.getElementById('appRoot').style.display='none';return;}
+  sbClient=window.supabase.createClient(cfg.url,cfg.key);
+  document.getElementById('configScreen').style.display='none';
+  document.getElementById('appRoot').style.display='block';
+  document.getElementById('firmNameDisplay').textContent=cfg.firma;
+  document.getElementById('settFirma').value=cfg.firma;
+  initFieldsCheck();
+  await loadData();
+  renderDashboard();populateFilters();
+}
+
+async function loadData(){
+  try{
+    const[pRes,iRes]=await Promise.all([
+      sbClient.from('projekti').select('*').order('od',{ascending:false}),
+      sbClient.from('inzenjeri').select('*').order('ime')
+    ]);
+    projekti=pRes.data||[];
+    const iData=iRes.data||[];
+    inzenjeri=iData.map(r=>r.ime);
+    iData.forEach(r=>{inzProfili[r.ime]=r;});
+    document.getElementById('tableLoading').style.display='none';
+  }catch(e){document.getElementById('tableLoading').textContent='Greška pri spajanju.';}
+}
+
+function fmtVal(v){if(!v)return'–';return Number(v).toLocaleString('hr-HR')+' €';}
+function fmtDate(m){if(!m)return'';const[y,mo]=m.split('-');const mj=['sij.','velj.','ožu.','tra.','svi.','lip.','srp.','kol.','ruj.','lis.','stu.','pro.'];return mj[parseInt(mo)-1]+' '+y;}
+function fmtTrajanje(od,d){if(!od)return'–';return fmtDate(od)+(d?' – '+fmtDate(d):' – u tijeku');}
+function badgeClass(tip){const map={'Stručni nadzor':'nadzor','Vođenje projekta':'vodenje','Projektiranje':'projektiranje','Konzultantske usluge':'kombinacija'};return'badge badge-'+(map[tip]||'nadzor');}
+function getYear(m){return m?parseInt(m.split('-')[0]):null;}
+function avatarColor(idx){return AVATAR_COLORS[idx%AVATAR_COLORS.length];}
+function initials(ime){return ime.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+function getInzUloge(p){return(p&&Array.isArray(p.inzenjeri_uloge))?p.inzenjeri_uloge:[];}
+
+function populateFilters(){
+  ['filterInz','expInz','cvInz'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const val=el.value;
+    const prefix=id==='cvInz'?'<option value="">— odaberi inženjera —</option>':'<option value="">Svi inženjeri</option>';
+    el.innerHTML=prefix+inzenjeri.map(i=>`<option${val===i?' selected':''}>${i}</option>`).join('');
+  });
+  const years=[...new Set(projekti.map(p=>getYear(p.od)).filter(Boolean))].sort((a,b)=>b-a);
+  const godEl=document.getElementById('filterGod');const gv=godEl.value;
+  godEl.innerHTML='<option value="">Sve godine</option>'+years.map(y=>`<option${gv==y?' selected':''}>${y}</option>`).join('');
+  // Populate category filter
+  const cats=[...new Set(projekti.map(p=>p.kategorija).filter(Boolean))].sort();
+  const katEl=document.getElementById('filterKat');if(!katEl)return;
+  const kv=katEl.value;
+  katEl.innerHTML='<option value="">Sve kategorije</option>'+cats.map(k=>`<option${kv===k?' selected':''}>${k}</option>`).join('');
+}
+
+function initFieldsCheck(){
+  const el=document.getElementById('fieldsCheck');
+  el.innerHTML=FIELDS_DEF.map(f=>`<label class="field-pill checked" id="fp_${f.id}" onclick="toggleField(this, event)"><input type="checkbox" checked value="${f.id}">${f.label}</label>`).join('');
+}
+function toggleField(el, event){
+  event.preventDefault();
+  el.classList.toggle('checked');
+  el.querySelector('input').checked=el.classList.contains('checked');
+}
+function getSelectedFields(){return[...document.querySelectorAll('#fieldsCheck input:checked')].map(c=>c.value);}
+
+function getFilteredProjekti(){
+  const q=(document.getElementById('search')?.value||'').toLowerCase();
+  const t=document.getElementById('filterTip')?.value||'';
+  const st=document.getElementById('filterStatus')?.value||'';
+  const kat=document.getElementById('filterKat')?.value||'';
+  const i=document.getElementById('filterInz')?.value||'';
+  const g=document.getElementById('filterGod')?.value||'';
+  const eu=document.getElementById('filterEU')?.value||'';
+  const minVr=Number(document.getElementById('filterMinVr')?.value||0);
+  const minUs=Number(document.getElementById('filterMinUs')?.value||0);
+
+  let res=projekti.filter(p=>{
+    if(q&&!p.naziv.toLowerCase().includes(q)&&!(p.lokacija||'').toLowerCase().includes(q)&&!(p.investitor||'').toLowerCase().includes(q)&&!(p.kategorija||'').toLowerCase().includes(q))return false;
+    if(t&&p.tip!==t)return false;
+    if(st&&p.status!==st)return false;
+    if(kat&&p.kategorija!==kat)return false;
+    if(i&&!getInzUloge(p).some(u=>u.ime===i))return false;
+    if(g&&getYear(p.od)!=g)return false;
+    if(eu==='true'&&!p.eu_sufinanciranje)return false;
+    if(eu==='false'&&p.eu_sufinanciranje)return false;
+    if(minVr&&(Number(p.vrijednost)||0)<minVr)return false;
+    if(minUs&&(Number(p.vrijednost_usluge)||0)<minUs)return false;
+    return true;
+  });
+
+  // Sorting
+  if(sortField){
+    res=[...res].sort((a,b)=>{
+      let av=a[sortField]||''; let bv=b[sortField]||'';
+      if(sortField==='vrijednost'||sortField==='vrijednost_usluge'){av=Number(av)||0;bv=Number(bv)||0;}
+      if(av<bv)return -1*sortDir; if(av>bv)return 1*sortDir; return 0;
+    });
+  }
+  return res;
+}
+
+function sortBy(field){
+  if(sortField===field){sortDir*=-1;}else{sortField=field;sortDir=1;}
+  // Update header indicators
+  document.querySelectorAll('[id^="si_"]').forEach(el=>el.textContent='');
+  const si=document.getElementById('si_'+field);
+  if(si) si.textContent=sortDir===1?' ↑':' ↓';
+  renderProjekti();
+}
+
+function clearFilters(){
+  ['search','filterMinVr','filterMinUs'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  ['filterTip','filterStatus','filterKat','filterInz','filterGod','filterEU'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.selectedIndex=0;
+  });
+  sortField=null;sortDir=1;
+  document.querySelectorAll('[id^="si_"]').forEach(el=>el.textContent='');
+  renderProjekti();
+}
+
+function renderProjekti(){
+  const filtered=getFilteredProjekti();
+  const tbody=document.getElementById('tableBody');
+  const empty=document.getElementById('tableEmpty');
+  if(!filtered.length){tbody.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tbody.innerHTML=filtered.map(p=>{
+    const uloge=getInzUloge(p);
+    // Group uloge by ime
+    const ulogeByIme={};
+    uloge.forEach(u=>{if(!ulogeByIme[u.ime])ulogeByIme[u.ime]=[];if(u.uloga)ulogeByIme[u.ime].push(u.uloga);});
+    const uniInz=Object.keys(ulogeByIme);
+    const pills=uniInz.slice(0,3).map(ime=>{const roles=ulogeByIme[ime];const abbr=ime.split(' ')[0][0]+'. '+ime.split(' ').slice(1).join(' ');return`<span class="inz-pill" title="${roles.join(', ')||''}">${abbr}</span>`;}).join('');
+    const more=uniInz.length>3?`<span class="inz-pill">+${uniInz.length-3}</span>`:'';
+    const euBadge=p.eu_sufinanciranje?`<span class="badge badge-eu">EU</span>`:'';
+    return`<tr>
+      <td style="font-weight:500;max-width:200px;line-height:1.4;">${p.naziv} ${euBadge}</td>
+      <td style="color:var(--text2);font-size:12px;">${p.kategorija||'–'}</td>
+      <td><span class="${badgeClass(p.tip)}">${p.tip}</span></td>
+      <td><span class="badge badge-${p.status==='Završeno'?'zavrseno':'u-tijeku'}">${p.status||'U tijeku'}</span></td>
+      <td style="white-space:nowrap;font-family:var(--mono);font-size:12px;">${fmtVal(p.vrijednost)}</td>
+      <td style="white-space:nowrap;font-family:var(--mono);font-size:12px;">${fmtVal(p.vrijednost_usluge)}</td>
+      <td style="max-width:130px;color:var(--text2);font-size:12px;">${p.investitor||'–'}</td>
+      <td style="white-space:nowrap;font-size:12px;color:var(--text2);">${fmtTrajanje(p.od,p.do)}</td>
+      <td>${pills}${more}</td>
+      <td><button class="btn btn-sm" onclick="openModal(${p.id})">uredi</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderInzenjeri(){
+  const q=(document.getElementById('searchInz')?.value||'').toLowerCase();
+  const grid=document.getElementById('inzGrid');const empty=document.getElementById('inzEmpty');
+  const list=inzenjeri.filter(i=>!q||i.toLowerCase().includes(q));
+  if(!list.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML=list.map((ime,idx)=>{
+    const[bg,fg]=avatarColor(idx);
+    const profil=inzProfili[ime]||{};
+    const uloge_na_proj=projekti.flatMap(p=>getInzUloge(p).filter(u=>u.ime===ime).map(u=>({...u,naziv:p.naziv,od:p.od})));
+    const ukupnoVal=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===ime)).reduce((s,p)=>s+(Number(p.vrijednost)||0),0);
+    return`<div class="inz-card">
+      <div class="inz-card-header">
+        <div class="avatar" style="background:${bg};color:${fg};">${initials(ime)}</div>
+        <div>
+          <div class="inz-name">${ime}</div>
+          <div class="inz-meta">${profil.obrazovanje||'–'} · ${profil.godine_iskustva?profil.godine_iskustva+' god. isku.':'–'}</div>
+          <div class="inz-meta">${profil.licenca||''}</div>
+        </div>
+      </div>
+      <div class="inz-projects">
+        ${(()=>{
+          // Group by project name to avoid duplicates, merge roles
+          const byProj={};
+          uloge_na_proj.forEach(u=>{
+            if(!byProj[u.naziv]) byProj[u.naziv]={...u,uloge:[]};
+            if(u.uloga) byProj[u.naziv].uloge.push(u.uloga);
+          });
+          return Object.values(byProj).slice(0,4).map(u=>`<div class="inz-proj-item"><span class="inz-proj-name">${u.naziv}</span>${u.uloge.length?`<span class="inz-proj-uloga" title="${u.uloge.join(', ')}">${u.uloge[0]}${u.uloge.length>1?' +'+( u.uloge.length-1):''}</span>`:''}<span style="font-size:11px;color:var(--text3);font-family:var(--mono);">${getYear(u.od)||''}</span></div>`).join('');
+        })()}
+        ${uloge_na_proj.length>4?`<div style="font-size:11px;color:var(--text3);padding:4px 0;">+ još ${uloge_na_proj.length-4} projekata</div>`:''}
+        ${uloge_na_proj.length===0?`<div style="font-size:12px;color:var(--text3);">Nema projekata u bazi</div>`:''}
+      </div>
+      <div class="inz-card-actions">
+        <button class="btn btn-sm" onclick="openModalInz('${ime}')">Uredi profil</button>
+        <button class="btn btn-sm btn-gen" onclick="quickCV('${ime}')">↓ CV</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderExport(){
+  const t=document.getElementById('expTip')?.value||'';const st=document.getElementById('expStatus')?.value||'';
+  const i=document.getElementById('expInz')?.value||'';const eu=document.getElementById('expEU')?.value||'';
+  const minV=Number(document.getElementById('expMinVal')?.value||0);const odGod=Number(document.getElementById('expOdGod')?.value||0);
+  const res=projekti.filter(p=>{
+    if(t&&p.tip!==t)return false;if(st&&p.status!==st)return false;
+    if(i&&!getInzUloge(p).some(u=>u.ime===i))return false;
+    if(eu==='true'&&!p.eu_sufinanciranje)return false;if(eu==='false'&&p.eu_sufinanciranje)return false;
+    if(minV&&(Number(p.vrijednost)||0)<minV)return false;if(odGod&&(getYear(p.od)||0)<odGod)return false;
+    return true;
+  });
+  const out=document.getElementById('exportResult');
+  if(!res.length){out.innerHTML='<div class="empty"><div class="empty-icon">↗</div><div>Nema referenci prema odabranim kriterijima</div></div>';return;}
+  const sep=' | ';
+  const header=`Rb.${sep}Naziv projekta${sep}Lokacija${sep}Kategorija${sep}Tip${sep}Uloga firme${sep}Vr. radova (€)${sep}Vr. usluge (€)${sep}Investitor${sep}Trajanje${sep}EU${sep}Inženjeri i uloge`;
+  const divider='–'.repeat(160);
+  const rows=res.map((p,idx)=>{
+    const uloge=getInzUloge(p).map(u=>`${u.ime}${u.uloga?' ('+u.uloga+')':''}`).join(', ');
+    return`${String(idx+1).padStart(3,' ')}.${sep}${p.naziv}${sep}${p.lokacija}${sep}${p.kategorija||'–'}${sep}${p.tip}${sep}${p.uloga_firme||'–'}${sep}${fmtVal(p.vrijednost)}${sep}${fmtVal(p.vrijednost_usluge)}${sep}${p.investitor||'–'}${sep}${fmtTrajanje(p.od,p.do)}${sep}${p.eu_sufinanciranje?'DA':'NE'}${sep}${uloge||'–'}`;
+  });
+  const txt=[header,divider,...rows].join('\n');
+  out.innerHTML=`<div class="export-card"><h3>Tablica referenci · ${res.length} projekata</h3><div class="export-output">${txt}</div></div>`;
+  out._raw=txt;
+}
+function copyExport(){const out=document.getElementById('exportResult');if(!out._raw){showToast('Nema podataka');return;}navigator.clipboard?.writeText(out._raw).then(()=>showToast('Tablica kopirana!')).catch(()=>showToast('Označite tekst ručno'));}
+
+function renderSidebarStats(){
+  if(document.getElementById('sec-dashboard')?.classList.contains('active')) renderDashboard();
+}
+
+function renderInzSettings(){
+  document.getElementById('inzListSettings').innerHTML=inzenjeri.map((ime,idx)=>{
+    const[bg,fg]=avatarColor(idx);const cnt=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===ime)).length;
+    return`<div class="inz-list-item"><div style="display:flex;align-items:center;gap:10px;"><div class="avatar" style="width:30px;height:30px;font-size:11px;background:${bg};color:${fg};">${initials(ime)}</div><span style="font-weight:500;">${ime}</span><span style="font-size:12px;color:var(--text3);">${cnt} projekata</span></div><div style="display:flex;gap:6px;"><button class="btn btn-sm" onclick="openModalInz('${ime}')">profil</button><button class="btn btn-sm btn-danger" onclick="removeInzenjer('${ime}')">ukloni</button></div></div>`;
+  }).join('');
+}
+
+async function addInzenjer(){
+  const inp=document.getElementById('newInzName');const ime=inp.value.trim();
+  if(!ime)return;if(inzenjeri.includes(ime)){showToast('Inženjer već postoji');return;}
+  const{error}=await sbClient.from('inzenjeri').insert({ime});
+  if(error){showToast('Greška: '+error.message);return;}
+  inzenjeri.push(ime);inzenjeri.sort();inp.value='';
+  populateFilters();renderInzSettings();renderSidebarStats();showToast(ime+' dodan!');
+}
+async function removeInzenjer(ime){
+  const cnt=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===ime)).length;
+  if(cnt>0&&!confirm(`${ime} je na ${cnt} projekata. Svejedno ukloniti?`))return;
+  const{error}=await sbClient.from('inzenjeri').delete().eq('ime',ime);
+  if(error){showToast('Greška: '+error.message);return;}
+  inzenjeri=inzenjeri.filter(i=>i!==ime);delete inzProfili[ime];
+  populateFilters();renderInzSettings();renderSidebarStats();showToast(ime+' uklonjen');
+}
+function saveFirmaName(){const ime=document.getElementById('settFirma').value.trim();if(!ime)return;localStorage.setItem('sb_firma',ime);document.getElementById('firmNameDisplay').textContent=ime;showToast('Naziv firme spremljen!');}
+
+// MODAL INŽENJER
+function openModalInz(ime){
+  editInzIme=ime;
+  const p=inzProfili[ime]||{};
+  document.getElementById('modalInzTitle').textContent='Profil: '+ime;
+  document.getElementById('iIme').value=ime;
+  document.getElementById('iObrazovanje').value=p.obrazovanje||'';
+  document.getElementById('iGodine').value=p.godine_iskustva||'';
+  document.getElementById('iLicenca').value=p.licenca||'';
+  document.getElementById('iEmail').value=p.email||'';
+  document.getElementById('iTelefon').value=p.telefon||'';
+  document.getElementById('iNapomena').value=p.napomena_profil||'';
+  document.getElementById('modalInz').style.display='block';
+}
+function closeModalInz(){document.getElementById('modalInz').style.display='none';editInzIme=null;}
+async function saveInzProfil(){
+  if(!editInzIme)return;
+  const data={
+    obrazovanje:document.getElementById('iObrazovanje').value.trim()||null,
+    godine_iskustva:Number(document.getElementById('iGodine').value)||null,
+    licenca:document.getElementById('iLicenca').value.trim()||null,
+    email:document.getElementById('iEmail').value.trim()||null,
+    telefon:document.getElementById('iTelefon').value.trim()||null,
+    napomena_profil:document.getElementById('iNapomena').value.trim()||null,
+  };
+  const{error}=await sbClient.from('inzenjeri').update(data).eq('ime',editInzIme);
+  if(error){showToast('Greška: '+error.message);return;}
+  inzProfili[editInzIme]={...inzProfili[editInzIme],...data,ime:editInzIme};
+  closeModalInz();renderInzenjeri();showToast('Profil spremenjen!');
+}
+
+// MODAL PROJEKT
+function openModal(id=null){
+  editId=id||null;const p=id?projekti.find(x=>x.id===id):null;
+  document.getElementById('modalTitle').textContent=p?'Uredi projekt':'Novi projekt';
+  document.getElementById('btnDelete').style.display=p?'inline-flex':'none';
+  document.getElementById('fNaziv').value=p?.naziv||'';document.getElementById('fLokacija').value=p?.lokacija||'';
+  document.getElementById('fKategorija').value=p?.kategorija||'';document.getElementById('fTip').value=p?.tip||'Stručni nadzor';
+  document.getElementById('fUlogaFirme').value=p?.uloga_firme||'';document.getElementById('fStatus').value=p?.status||'U tijeku';
+  document.getElementById('fBrojUgovora').value=p?.broj_ugovora||'';document.getElementById('fEU').checked=p?.eu_sufinanciranje||false;
+  document.getElementById('fVrijednost').value=p?.vrijednost||'';document.getElementById('fVrijednostUsluge').value=p?.vrijednost_usluge||'';
+  document.getElementById('fPovrsina').value=p?.povrsina||'';document.getElementById('fDuzina').value=p?.duzina_trase||'';
+  document.getElementById('fInvestitor').value=p?.investitor||'';document.getElementById('fInvestitorAdresa').value=p?.investitor_adresa||'';
+  document.getElementById('fKontaktOsoba').value=p?.kontakt_osoba||'';document.getElementById('fKontaktEmail').value=p?.kontakt_email||'';
+  document.getElementById('fKontaktTel').value=p?.kontakt_tel||'';
+  document.getElementById('fOd').value=p?.od||'';document.getElementById('fDo').value=p?.do||'';
+  document.getElementById('fNapomena').value=p?.napomena||'';document.getElementById('fOpisRadova').value=p?.opis_radova||'';
+  const existingUloge=getInzUloge(p);
+  document.getElementById('inzUlogeList').innerHTML=inzenjeri.map(ime=>{
+    const existing=existingUloge.filter(u=>u.ime===ime);
+    const checked=existing.length>0;
+    const ulogeVals=existing.map(u=>u.uloga||'');
+    // Build checkboxes for each role
+    const roleChecks=ULOGE.map(u=>{
+      const isChecked=ulogeVals.includes(u);
+      return`<label style="display:flex;align-items:center;gap:4px;font-size:12px;padding:2px 0;cursor:pointer;"><input type="checkbox" class="role-check" data-ime="${ime}" value="${u}" ${isChecked?'checked':''}> ${u}</label>`;
+    }).join('');
+    const customVal=ulogeVals.filter(u=>!ULOGE.includes(u)&&u).join(', ');
+    return`<div class="inz-uloga-row" style="grid-template-columns:1fr 2fr;">
+      <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-weight:500;font-size:13px;"><input type="checkbox" class="inz-main-check" value="${ime}" ${checked?'checked':''} onchange="toggleUlogaRow(this)"><span>${ime}</span></label>
+      <div class="uloge-panel" style="${!checked?'display:none':''}">
+        <div style="display:flex;flex-wrap:wrap;gap:4px 16px;margin-bottom:6px;">${roleChecks}</div>
+        <input class="custom-uloga" data-ime="${ime}" placeholder="Dodatna uloga (npr. BIM koordinator)..." value="${customVal}" style="width:100%;font-size:12px;padding:4px 8px;">
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('modal').style.display='block';
+}
+function toggleUlogaRow(cb){
+  const row=cb.closest('.inz-uloga-row');
+  const panel=row.querySelector('.uloge-panel');
+  if(panel) panel.style.display=cb.checked?'':'none';
+}
+function closeModal(){document.getElementById('modal').style.display='none';editId=null;}
+async function deleteProject(){
+  if(!editId||!confirm('Obrisati ovaj projekt?'))return;
+  const{error}=await sbClient.from('projekti').delete().eq('id',editId);
+  if(error){showToast('Greška: '+error.message);return;}
+  projekti=projekti.filter(p=>p.id!==editId);closeModal();renderProjekti();renderSidebarStats();populateFilters();showToast('Projekt obrisan');
+}
+async function saveProject(){
+  const naziv=document.getElementById('fNaziv').value.trim();const lokacija=document.getElementById('fLokacija').value.trim();
+  if(!naziv||!lokacija){showToast('Naziv i lokacija su obavezni!');return;}
+  const inzUloge=[];
+  document.querySelectorAll('#inzUlogeList .inz-main-check:checked').forEach(mainCb=>{
+    const ime=mainCb.value;
+    const row=mainCb.closest('.inz-uloga-row');
+    const checkedRoles=[...row.querySelectorAll('.role-check:checked')].map(rc=>rc.value);
+    const customUloga=(row.querySelector('.custom-uloga')?.value||'').trim();
+    const customRoles=customUloga?customUloga.split(',').map(s=>s.trim()).filter(Boolean):[];
+    const allRoles=[...checkedRoles,...customRoles];
+    if(allRoles.length===0){
+      inzUloge.push({ime,uloga:''});
+    } else {
+      allRoles.forEach(uloga=>inzUloge.push({ime,uloga}));
+    }
+  });
+  const data={
+    naziv,lokacija,kategorija:document.getElementById('fKategorija').value.trim()||null,
+    tip:document.getElementById('fTip').value,uloga_firme:document.getElementById('fUlogaFirme').value.trim()||null,
+    status:document.getElementById('fStatus').value,broj_ugovora:document.getElementById('fBrojUgovora').value.trim()||null,
+    eu_sufinanciranje:document.getElementById('fEU').checked,
+    vrijednost:Number(document.getElementById('fVrijednost').value)||null,
+    vrijednost_usluge:Number(document.getElementById('fVrijednostUsluge').value)||null,
+    povrsina:Number(document.getElementById('fPovrsina').value)||null,
+    duzina_trase:Number(document.getElementById('fDuzina').value)||null,
+    investitor:document.getElementById('fInvestitor').value.trim()||null,
+    investitor_adresa:document.getElementById('fInvestitorAdresa').value.trim()||null,
+    kontakt_osoba:document.getElementById('fKontaktOsoba').value.trim()||null,
+    kontakt_email:document.getElementById('fKontaktEmail').value.trim()||null,
+    kontakt_tel:document.getElementById('fKontaktTel').value.trim()||null,
+    od:document.getElementById('fOd').value||null,do:document.getElementById('fDo').value||null,
+    inzenjeri_uloge:inzUloge,napomena:document.getElementById('fNapomena').value.trim()||null,
+    opis_radova:document.getElementById('fOpisRadova').value.trim()||null,
+  };
+  let error;
+  if(editId){
+    ({error}=await sbClient.from('projekti').update(data).eq('id',editId));
+    if(!error){const idx=projekti.findIndex(p=>p.id===editId);projekti[idx]={...projekti[idx],...data};}
+  }else{
+    const res=await sbClient.from('projekti').insert(data).select().single();
+    error=res.error;if(!error)projekti.unshift(res.data);
+  }
+  if(error){showToast('Greška: '+error.message);return;}
+  closeModal();renderProjekti();renderSidebarStats();populateFilters();
+  showToast(editId?'Projekt ažuriran!':'Projekt dodan!');
+}
+
+// ---- GENERIRANJE DOKUMENATA ----
+function filterProjekti(tip, odGod){
+  return projekti.filter(p=>{
+    if(tip&&p.tip!==tip)return false;
+    if(odGod&&(getYear(p.od)||0)<parseInt(odGod))return false;
+    return true;
+  });
+}
+
+function genPortfelj(){
+  const tip=document.getElementById('genTip').value;
+  const odGod=document.getElementById('genOdGod').value;
+  const naslov=document.getElementById('genNaslov').value||'Portfelj projekata';
+  const fields=getSelectedFields();
+  const sel=filterProjekti(tip,odGod);
+  if(!sel.length){showToast('Nema projekata prema odabranim filterima');return;}
+  const cfg=loadConfig();
+  const data={projekti:sel,params:{firma:cfg.firma,naslov,fields:fields.join(',')}};
+  callGenerateAPI('portfelj',data);
+}
+
+function genPopis(){
+  const narucitelj=document.getElementById('pisNarucitelj').value.trim();
+  const predmet=document.getElementById('pisPredmet').value.trim();
+  if(!narucitelj||!predmet){showToast('Naručitelj i predmet su obavezni!');return;}
+  const tip=document.getElementById('pisTip').value;
+  const odGod=document.getElementById('pisOdGod').value;
+  const sel=filterProjekti(tip,odGod);
+  if(!sel.length){showToast('Nema projekata prema odabranim filterima');return;}
+  const cfg=loadConfig();
+  const data={projekti:sel,params:{
+    firma:cfg.firma,narucitelj,
+    adresa_narucitelja:document.getElementById('pisAdrNar').value,
+    predmet,ev_broj:document.getElementById('pisEvBroj').value,
+    grad:document.getElementById('pisGrad').value||'Zagreb',
+    datum:new Date().toLocaleDateString('hr-HR'),
+  }};
+  callGenerateAPI('popis',data);
+}
+
+function genCV(){
+  const ime=document.getElementById('cvInz').value;
+  const pozicija=document.getElementById('cvPozicija').value.trim();
+  if(!ime){showToast('Odaberi inženjera!');return;}
+  if(!pozicija){showToast('Upiši poziciju na natječaju!');return;}
+  const tip=document.getElementById('cvTip').value;
+  const odGod=document.getElementById('cvOdGod').value;
+  const inzProj=projekti.filter(p=>{
+    if(!getInzUloge(p).some(u=>u.ime===ime))return false;
+    if(tip&&p.tip!==tip)return false;
+    if(odGod&&(getYear(p.od)||0)<parseInt(odGod))return false;
+    return true;
+  });
+  if(!inzProj.length){showToast('Nema projekata za odabranog inženjera s tim filterima');return;}
+  const cfg=loadConfig();
+  const data={inzenjer:{...inzProfili[ime],ime},projekti:inzProj,params:{firma:cfg.firma,pozicija}};
+  callGenerateAPI('cv',data);
+}
+
+function quickCV(ime){
+  const pozicija=prompt('Pozicija inženjera na natječaju:','Nadzorni inženjer');
+  if(!pozicija)return;
+  const inzProj=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===ime));
+  if(!inzProj.length){showToast('Nema projekata za ovog inženjera');return;}
+  const cfg=loadConfig();
+  const data={inzenjer:{...inzProfili[ime],ime},projekti:inzProj,params:{firma:cfg.firma,pozicija}};
+  callGenerateAPI('cv',data);
+}
+
+const SERVER_URL = 'https://exstructa-server-production.up.railway.app';
+
+async function callGenerateAPI(tip, data){
+  showToast('Generiranje dokumenta...');
+  try{
+    const response = await fetch(SERVER_URL + '/' + tip, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if(!response.ok){
+      const err = await response.json().catch(()=>({error:'Greška servera'}));
+      showToast('Greška: ' + (err.error||response.statusText));
+      return;
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const cd = response.headers.get('Content-Disposition')||'';
+    const match = cd.match(/filename="([^"]+)"/);
+    a.download = match ? match[1] : tip + '_' + Date.now() + '.docx';
+    a.href = url;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Dokument preuzet!');
+  }catch(e){
+    showToast('Greška: ' + e.message);
+  }
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  else {
+    // Find and activate correct nav item
+    document.querySelectorAll('.nav-item').forEach(b=>{
+      if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+name+"'")) b.classList.add('active');
+    });
+  }
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  const titles={dashboard:'Pregled',projekti:'Projekti',inzenjeri:'Inženjeri',generiraj:'Generiraj dokument',export:'Export za natječaj',postavke:'Postavke'};
+  document.getElementById('topbarTitle').textContent=titles[name]||name;
+  const actEl=document.getElementById('topbarActions');
+  actEl.innerHTML=name==='projekti'?'<button class="btn btn-primary" onclick="openModal()">+ Novi projekt</button>':
+    name==='dashboard'?'<button class="btn btn-primary" onclick="openModal()">+ Novi projekt</button>':'';
+  if(name==='dashboard')renderDashboard();
+  if(name==='inzenjeri')renderInzenjeri();
+  if(name==='export')renderExport();
+  if(name==='postavke')renderInzSettings();
+}
+
+function renderDashboard(){
+  const ukupnoVal=projekti.reduce((s,p)=>s+(Number(p.vrijednost)||0),0);
+  const ukupnoUsl=projekti.reduce((s,p)=>s+(Number(p.vrijednost_usluge)||0),0);
+  const aktivni=projekti.filter(p=>p.status==='U tijeku').length;
+  const zavrseni=projekti.filter(p=>p.status==='Završeno').length;
+  const euProj=projekti.filter(p=>p.eu_sufinanciranje).length;
+
+  document.getElementById('dashKPI').innerHTML=`
+    <div class="kpi-card" style="--kpi-color:#83CE00;">
+      <div class="kpi-label">Ukupno projekata</div>
+      <div class="kpi-value">${projekti.length}</div>
+      <div class="kpi-sub">${aktivni} aktivnih · ${zavrseni} završenih</div>
+      <div class="kpi-icon">◫</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:#1A3A6B;">
+      <div class="kpi-label">Vrijednost radova</div>
+      <div class="kpi-value">${(ukupnoVal/1000000).toFixed(1)}<span style="font-size:16px;font-weight:400;color:var(--text3);"> M€</span></div>
+      <div class="kpi-sub">kumulativno u bazi</div>
+      <div class="kpi-icon">€</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:#4A7C28;">
+      <div class="kpi-label">Vrijednost usluga</div>
+      <div class="kpi-value">${(ukupnoUsl/1000000).toFixed(2)}<span style="font-size:16px;font-weight:400;color:var(--text3);"> M€</span></div>
+      <div class="kpi-sub">naplaćenih konzultantskih usluga</div>
+      <div class="kpi-icon">◎</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:#7A4A00;">
+      <div class="kpi-label">EU projekti</div>
+      <div class="kpi-value">${euProj}</div>
+      <div class="kpi-sub">${projekti.length?Math.round(euProj/projekti.length*100):0}% portfelja</div>
+      <div class="kpi-icon">★</div>
+    </div>`;
+
+  // Recent projects
+  const recent=[...projekti].sort((a,b)=>(b.od||'').localeCompare(a.od||'')).slice(0,5);
+  document.getElementById('dashRecentProj').innerHTML=recent.length?recent.map(p=>`
+    <div class="dash-proj-item">
+      <span class="badge badge-${badgeClass(p.tip).split('-')[2]||'nadzor'}" style="flex-shrink:0;">${p.tip}</span>
+      <div style="flex:1;min-width:0;">
+        <div class="dash-proj-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.naziv}</div>
+        <div style="font-size:11px;color:var(--text3);">${p.investitor||'–'}</div>
+      </div>
+      <div class="dash-proj-meta">
+        <div>${fmtVal(p.vrijednost)}</div>
+        <div>${fmtDate(p.od)||'–'}</div>
+      </div>
+    </div>`).join(''):'<div style="color:var(--text3);font-size:13px;padding:20px 0;">Nema projekata u bazi.</div>';
+
+  // Type bars
+  const tipovi=['Stručni nadzor','Vođenje projekta','Projektiranje','Konzultantske usluge'];
+  const max=Math.max(...tipovi.map(t=>projekti.filter(p=>p.tip===t).length),1);
+  document.getElementById('dashTipBars').innerHTML=tipovi.map(t=>{
+    const cnt=projekti.filter(p=>p.tip===t).length;
+    const pct=Math.round(cnt/max*100);
+    return`<div class="dash-bar-wrap">
+      <div class="dash-bar-label"><span>${t}</span><span>${cnt} projekata</span></div>
+      <div class="dash-bar-track"><div class="dash-bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+initApp();
+</script>
+</body>
+</html>
