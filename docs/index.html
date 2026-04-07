@@ -182,28 +182,83 @@ tbody tr:hover{background:#FAFAF8;}
 </head>
 <body>
 
-<div id="configScreen" class="config-screen" style="display:flex;">
-  <div class="config-card">
-    <h1>Dobrodošli u ORDO</h1>
-    <p class="sub">ORDO — referentni sustav za građevinske konzultante. Unesite podatke za spajanje na bazu. Ovo je potrebno samo jednom po uređaju.</p>
-    <div class="config-step"><strong>Supabase Project URL</strong>Settings → API → Project URL</div>
-    <div class="config-step"><strong>Supabase Anon Key</strong>Settings → API → anon public key (počinje s eyJ...)</div>
-    <div class="config-inputs">
-      <div class="form-group"><label>Supabase Project URL</label><input id="cfgUrl" placeholder="https://xxxx.supabase.co"></div>
-      <div class="form-group"><label>Supabase Anon Key</label><input id="cfgKey" placeholder="eyJhbGci..."></div>
-      <div class="form-group"><label>Naziv firme</label><input id="cfgFirma" placeholder="npr. Exstructa d.o.o."></div>
+<div id="configScreen" style="display:flex;min-height:100vh;background:#0D1A0F;flex-direction:column;">
+
+  <!-- NASLOVNA -->
+  <div id="landingPage" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:60px 40px;text-align:center;">
+    <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(131,206,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(131,206,0,0.04) 1px,transparent 1px);background-size:40px 40px;"></div>
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:500px;height:500px;background:radial-gradient(circle,rgba(131,206,0,0.07) 0%,transparent 70%);"></div>
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;">
+      <!-- LOGO A -->
+      <div style="display:flex;align-items:center;gap:18px;margin-bottom:28px;">
+        <svg width="64" height="64" viewBox="0 0 52 52" fill="none">
+          <circle cx="26" cy="26" r="23" stroke="#F0EDE6" stroke-width="1.5"/>
+          <circle cx="26" cy="26" r="14" stroke="#F0EDE6" stroke-width="1.5"/>
+          <line x1="26" y1="3" x2="26" y2="12" stroke="#F0EDE6" stroke-width="1.5"/>
+          <line x1="26" y1="40" x2="26" y2="49" stroke="#F0EDE6" stroke-width="1.5"/>
+          <line x1="3" y1="26" x2="12" y2="26" stroke="#F0EDE6" stroke-width="1.5"/>
+          <line x1="40" y1="26" x2="49" y2="26" stroke="#F0EDE6" stroke-width="1.5"/>
+          <circle cx="26" cy="26" r="3" fill="#F0EDE6"/>
+        </svg>
+        <div style="text-align:left;">
+          <div style="font-size:52px;font-weight:700;color:#F0EDE6;letter-spacing:-0.02em;line-height:1;">ORDO</div>
+          <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(240,237,230,0.35);margin-top:4px;">referentni sustav</div>
+        </div>
+      </div>
+      <div style="font-size:15px;color:rgba(255,255,255,0.4);margin-bottom:48px;letter-spacing:0.01em;">Red u vašim referencama.</div>
+      <button onclick="showLogin()" style="background:#83CE00;color:#0D1A0F;border:none;padding:14px 40px;font-size:15px;font-weight:600;font-family:inherit;border-radius:8px;cursor:pointer;letter-spacing:0.02em;">Uđi u aplikaciju →</button>
     </div>
-    <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="saveConfig()">Spoji na bazu →</button>
-    <p style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center;">Podaci se čuvaju lokalno u vašem browseru</p>
+    <div style="position:absolute;bottom:20px;font-size:11px;color:rgba(255,255,255,0.15);font-family:monospace;">ORDO v1.0</div>
   </div>
+
+  <!-- LOGIN FORMA -->
+  <div id="loginPage" style="display:none;flex:1;align-items:center;justify-content:center;padding:40px 20px;flex-direction:column;background:#0D1A0F;">
+    <div style="background:#fff;border-radius:14px;padding:36px;width:480px;max-width:100%;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+        <svg width="32" height="32" viewBox="0 0 52 52" fill="none">
+          <circle cx="26" cy="26" r="23" stroke="#0D1A0F" stroke-width="1.5"/>
+          <circle cx="26" cy="26" r="14" stroke="#0D1A0F" stroke-width="1.5"/>
+          <line x1="26" y1="3" x2="26" y2="12" stroke="#0D1A0F" stroke-width="1.5"/>
+          <line x1="26" y1="40" x2="26" y2="49" stroke="#0D1A0F" stroke-width="1.5"/>
+          <line x1="3" y1="26" x2="12" y2="26" stroke="#0D1A0F" stroke-width="1.5"/>
+          <line x1="40" y1="26" x2="49" y2="26" stroke="#0D1A0F" stroke-width="1.5"/>
+          <circle cx="26" cy="26" r="3" fill="#0D1A0F"/>
+        </svg>
+        <div>
+          <div style="font-size:20px;font-weight:700;color:#1A1916;">Spoji na bazu</div>
+          <div style="font-size:12px;color:#9C9A94;margin-top:1px;">Jednom po uređaju</div>
+        </div>
+      </div>
+      <div class="config-step"><strong>Supabase Project URL</strong>Settings → API → Project URL</div>
+      <div class="config-step"><strong>Supabase Anon Key</strong>Settings → API → anon public key (počinje s eyJ...)</div>
+      <div class="config-inputs">
+        <div class="form-group"><label>Supabase Project URL</label><input id="cfgUrl" placeholder="https://xxxx.supabase.co"></div>
+        <div class="form-group"><label>Supabase Anon Key</label><input id="cfgKey" placeholder="eyJhbGci..."></div>
+        <div class="form-group"><label>Naziv firme</label><input id="cfgFirma" placeholder="npr. Exstructa d.o.o."></div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="saveConfig()">Spoji na bazu →</button>
+      <p style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center;">Podaci se čuvaju lokalno u vašem browseru</p>
+    </div>
+  </div>
+
 </div>
 
 <div id="appRoot" style="display:none;">
 <div class="layout">
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <div class="firm-name" id="firmNameDisplay">Baza referenci</div>
-      <div class="firm-sub">ORDO · referentni sustav</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <svg width="28" height="28" viewBox="0 0 52 52" fill="none">
+          <circle cx="26" cy="26" r="23" stroke="#F0EDE6" stroke-width="1.5"/>
+          <circle cx="26" cy="26" r="14" stroke="#F0EDE6" stroke-width="1.5"/>
+          <line x1="26" y1="3" x2="26" y2="12" stroke="#F0EDE6" stroke-width="1.5"/>
+          <line x1="26" y1="40" x2="26" y2="49" stroke="#F0EDE6" stroke-width="1.5"/>
+          <line x1="3" y1="26" x2="12" y2="26" stroke="#F0EDE6" stroke-width="1.5"/>
+          <line x1="40" y1="26" x2="49" y2="26" stroke="#F0EDE6" stroke-width="1.5"/>
+          <circle cx="26" cy="26" r="3" fill="#F0EDE6"/>
+        </svg>
+        <div class="firm-name" id="firmNameDisplay">Exstructa d.o.o.</div>
+      </div>
     </div>
     <nav class="nav">
       <button class="nav-item active" onclick="switchTab('dashboard',this)"><span class="nav-dot"></span> Pregled</button>
@@ -212,7 +267,7 @@ tbody tr:hover{background:#FAFAF8;}
       <button class="nav-item" onclick="switchTab('inzenjeri',this)"><span class="nav-dot"></span> Inženjeri</button>
       <div class="nav-section">Dokumenti</div>
       <button class="nav-item" onclick="switchTab('generiraj',this)"><span class="nav-dot"></span> Generiraj dokument</button>
-      <button class="nav-item" onclick="switchTab('export',this)"><span class="nav-dot"></span> Export za natječaj</button>
+
       <div class="nav-section">Sustav</div>
       <button class="nav-item" onclick="switchTab('postavke',this)"><span class="nav-dot"></span> Postavke</button>
     </nav>
@@ -222,8 +277,24 @@ tbody tr:hover{background:#FAFAF8;}
   </aside>
   <main class="main">
     <div class="topbar">
-      <div class="topbar-title" id="topbarTitle">Projekti</div>
-      <div class="topbar-actions" id="topbarActions"><button class="btn btn-primary" onclick="openModal()">+ Novi projekt</button></div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div id="topbarTitle" style="font-size:13px;color:var(--text3);font-weight:400;"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div style="text-align:right;">
+          <div style="font-size:16px;font-weight:700;color:var(--text);letter-spacing:0.04em;">ORDO</div>
+          <div style="font-size:10px;color:var(--text3);letter-spacing:0.12em;text-transform:uppercase;margin-top:-1px;">referentni sustav</div>
+        </div>
+        <svg width="28" height="28" viewBox="0 0 52 52" fill="none">
+          <circle cx="26" cy="26" r="23" stroke="#1A1916" stroke-width="1.5"/>
+          <circle cx="26" cy="26" r="14" stroke="#1A1916" stroke-width="1.5"/>
+          <line x1="26" y1="3" x2="26" y2="12" stroke="#1A1916" stroke-width="1.5"/>
+          <line x1="26" y1="40" x2="26" y2="49" stroke="#1A1916" stroke-width="1.5"/>
+          <line x1="3" y1="26" x2="12" y2="26" stroke="#1A1916" stroke-width="1.5"/>
+          <line x1="40" y1="26" x2="49" y2="26" stroke="#1A1916" stroke-width="1.5"/>
+          <circle cx="26" cy="26" r="3" fill="#1A1916"/>
+        </svg>
+      </div>
     </div>
     <div class="content">
 
@@ -316,76 +387,116 @@ tbody tr:hover{background:#FAFAF8;}
 
       <!-- GENERIRAJ -->
       <div class="section" id="sec-generiraj">
-
-        <!-- PORTFELJ -->
-        <div class="gen-card">
-          <h3>Portfelj projekata</h3>
-          <p>Generiraj Word dokument s odabranim projektima u Exstructa stilu.</p>
-          <div class="gen-options">
-            <div class="gen-option"><label>Tip usluge (filter)</label>
-              <select id="genTip"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
+        <!-- ODABIR PODKATEGORIJE -->
+        <div id="genMenu" style="display:block;">
+          <div style="margin-bottom:24px;">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Odaberi vrstu dokumenta za pripremu:</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <button class="dash-quick-btn" onclick="showGenSub('portfelj')">
+                <div class="dash-quick-btn-icon">◫</div>
+                <span class="dash-quick-btn-title">Portfelj projekata</span>
+                <span class="dash-quick-btn-sub">Word dokument s odabranim referencama</span>
+              </button>
+              <button class="dash-quick-btn" onclick="showGenSub('cv')">
+                <div class="dash-quick-btn-icon">◎</div>
+                <span class="dash-quick-btn-title">Životopis stručnjaka</span>
+                <span class="dash-quick-btn-sub">CV inženjera s projektima iz baze</span>
+              </button>
+              <button class="dash-quick-btn" onclick="showGenSub('popis')">
+                <div class="dash-quick-btn-icon">≡</div>
+                <span class="dash-quick-btn-title">Popis usluga</span>
+                <span class="dash-quick-btn-sub">Landscape memorandum za natječaj</span>
+              </button>
+              <button class="dash-quick-btn" onclick="showGenSub('export')">
+                <div class="dash-quick-btn-icon">↗</div>
+                <span class="dash-quick-btn-title">Export za natječaj</span>
+                <span class="dash-quick-btn-sub">Filtrirane reference u tabličnom prikazu</span>
+              </button>
             </div>
-            <div class="gen-option"><label>Od godine</label><input id="genOdGod" type="number" placeholder="npr. 2020" min="2000" max="2030"></div>
-            <div class="gen-option" style="grid-column:1/-1;"><label>Polja za prikaz</label>
-              <div class="fields-check" id="fieldsCheck"></div>
-            </div>
-            <div class="gen-option"><label>Naslov dokumenta</label><input id="genNaslov" placeholder="Portfelj projekata"></div>
           </div>
-          <button class="btn btn-primary" onclick="genPortfelj()">↓ Preuzmi Word portfelj</button>
         </div>
 
-        <!-- POPIS USLUGA -->
-        <div class="gen-card">
-          <h3>Popis izvršenih usluga</h3>
-          <p>Generiraj obrazac popisa usluga za natječaj (landscape memorandum, 5 stupaca).</p>
-          <div class="gen-options">
-            <div class="gen-option" style="grid-column:1/-1;"><label>Naziv naručitelja *</label><input id="pisNarucitelj" placeholder="MINISTARSTVO PRAVOSUĐA, UPRAVE I DIGITALNE TRANSFORMACIJE"></div>
-            <div class="gen-option" style="grid-column:1/-1;"><label>Adresa naručitelja</label><input id="pisAdrNar" placeholder="Ulica grada Vukovara 49, 10000 Grad Zagreb"></div>
-            <div class="gen-option" style="grid-column:1/-1;"><label>Predmet nabave *</label><input id="pisPredmet" placeholder="Usluga stručnog nadzora..."></div>
-            <div class="gen-option"><label>Evidencijski broj nabave</label><input id="pisEvBroj" placeholder="npr. 112/24"></div>
-            <div class="gen-option"><label>Filter – tip usluge</label>
-              <select id="pisTip"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
+        <!-- PORTFELJ -->
+        <div id="genSub-portfelj" style="display:none;">
+          <button onclick="showGenMenu()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:6px;">← Natrag</button>
+          <div class="gen-card">
+            <h3>Portfelj projekata</h3>
+            <p>Word dokument s odabranim projektima u Exstructa stilu.</p>
+            <div class="gen-options">
+              <div class="gen-option"><label>Tip usluge (filter)</label>
+                <select id="genTip"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
+              </div>
+              <div class="gen-option"><label>Od godine</label><input id="genOdGod" type="number" placeholder="npr. 2020" min="2000" max="2030"></div>
+              <div class="gen-option" style="grid-column:1/-1;"><label>Polja za prikaz</label>
+                <div class="fields-check" id="fieldsCheck"></div>
+              </div>
+              <div class="gen-option"><label>Naslov dokumenta</label><input id="genNaslov" placeholder="Portfelj projekata"></div>
             </div>
-            <div class="gen-option"><label>Od godine</label><input id="pisOdGod" type="number" placeholder="npr. 2022" min="2000" max="2030"></div>
-            <div class="gen-option"><label>Grad (za potpis)</label><input id="pisGrad" placeholder="Zagreb" value="Zagreb"></div>
+            <button class="btn btn-primary" onclick="genPortfelj()">↓ Preuzmi Word portfelj</button>
           </div>
-          <button class="btn btn-primary" onclick="genPopis()">↓ Preuzmi popis usluga</button>
         </div>
 
         <!-- CV -->
-        <div class="gen-card">
-          <h3>CV stručnjaka</h3>
-          <p>Generiraj životopis inženjera s relevantnim projektima iz baze.</p>
-          <div class="gen-options">
-            <div class="gen-option"><label>Inženjer *</label>
-              <select id="cvInz"><option value="">— odaberi inženjera —</option></select>
+        <div id="genSub-cv" style="display:none;">
+          <button onclick="showGenMenu()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:6px;">← Natrag</button>
+          <div class="gen-card">
+            <h3>Životopis stručnjaka</h3>
+            <p>CV inženjera s relevantnim projektima iz baze.</p>
+            <div class="gen-options">
+              <div class="gen-option"><label>Inženjer *</label>
+                <select id="cvInz"><option value="">— odaberi inženjera —</option></select>
+              </div>
+              <div class="gen-option"><label>Pozicija na natječaju *</label><input id="cvPozicija" placeholder="npr. Glavni nadzorni inženjer"></div>
+              <div class="gen-option"><label>Filter – tip projekata</label>
+                <select id="cvTip"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
+              </div>
+              <div class="gen-option"><label>Od godine</label><input id="cvOdGod" type="number" placeholder="npr. 2020" min="2000" max="2030"></div>
             </div>
-            <div class="gen-option"><label>Pozicija na natječaju *</label><input id="cvPozicija" placeholder="npr. Glavni nadzorni inženjer"></div>
-            <div class="gen-option"><label>Filter – tip projekata</label>
-              <select id="cvTip"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
-            </div>
-            <div class="gen-option"><label>Od godine</label><input id="cvOdGod" type="number" placeholder="npr. 2020" min="2000" max="2030"></div>
+            <button class="btn btn-primary" onclick="genCV()">↓ Preuzmi CV</button>
           </div>
-          <button class="btn btn-primary" onclick="genCV()">↓ Preuzmi CV</button>
+        </div>
+
+        <!-- POPIS USLUGA -->
+        <div id="genSub-popis" style="display:none;">
+          <button onclick="showGenMenu()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:6px;">← Natrag</button>
+          <div class="gen-card">
+            <h3>Popis izvršenih usluga</h3>
+            <p>Landscape memorandum za natječaj (5 stupaca).</p>
+            <div class="gen-options">
+              <div class="gen-option" style="grid-column:1/-1;"><label>Naziv naručitelja *</label><input id="pisNarucitelj" placeholder="MINISTARSTVO PRAVOSUĐA, UPRAVE I DIGITALNE TRANSFORMACIJE"></div>
+              <div class="gen-option" style="grid-column:1/-1;"><label>Adresa naručitelja</label><input id="pisAdrNar" placeholder="Ulica grada Vukovara 49, 10000 Grad Zagreb"></div>
+              <div class="gen-option" style="grid-column:1/-1;"><label>Predmet nabave *</label><input id="pisPredmet" placeholder="Usluga stručnog nadzora..."></div>
+              <div class="gen-option"><label>Evidencijski broj nabave</label><input id="pisEvBroj" placeholder="npr. 112/24"></div>
+              <div class="gen-option"><label>Filter – tip usluge</label>
+                <select id="pisTip"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
+              </div>
+              <div class="gen-option"><label>Od godine</label><input id="pisOdGod" type="number" placeholder="npr. 2022" min="2000" max="2030"></div>
+              <div class="gen-option"><label>Grad (za potpis)</label><input id="pisGrad" placeholder="Zagreb" value="Zagreb"></div>
+            </div>
+            <button class="btn btn-primary" onclick="genPopis()">↓ Preuzmi popis usluga</button>
+          </div>
+        </div>
+
+        <!-- EXPORT -->
+        <div id="genSub-export" style="display:none;">
+          <button onclick="showGenMenu()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:6px;">← Natrag</button>
+          <div class="export-card">
+            <h3>Filtri za natječaj</h3>
+            <div class="toolbar" style="margin-bottom:0;">
+              <select id="expTip" onchange="renderExport()"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
+              <select id="expStatus" onchange="renderExport()"><option value="">Svi statusi</option><option>U tijeku</option><option>Završeno</option></select>
+              <select id="expInz" onchange="renderExport()"><option value="">Svi inženjeri</option></select>
+              <select id="expEU" onchange="renderExport()"><option value="">EU i ostalo</option><option value="true">Samo EU</option><option value="false">Bez EU</option></select>
+              <input id="expMinVal" type="number" placeholder="Min. vr. radova (€)" style="width:170px;" oninput="renderExport()">
+              <input id="expOdGod" type="number" placeholder="Od godine" style="width:110px;" oninput="renderExport()">
+              <button class="btn btn-primary" onclick="copyExport()">Kopiraj tablicu</button>
+            </div>
+          </div>
+          <div id="exportResult"></div>
         </div>
       </div>
 
-      <!-- EXPORT TABLICA -->
-      <div class="section" id="sec-export">
-        <div class="export-card">
-          <h3>Filtri za natječaj</h3>
-          <div class="toolbar" style="margin-bottom:0;">
-            <select id="expTip" onchange="renderExport()"><option value="">Svi tipovi</option><option>Stručni nadzor</option><option>Vođenje projekta</option><option>Projektiranje</option><option>Konzultantske usluge</option></select>
-            <select id="expStatus" onchange="renderExport()"><option value="">Svi statusi</option><option>U tijeku</option><option>Završeno</option></select>
-            <select id="expInz" onchange="renderExport()"><option value="">Svi inženjeri</option></select>
-            <select id="expEU" onchange="renderExport()"><option value="">EU i ostalo</option><option value="true">Samo EU</option><option value="false">Bez EU</option></select>
-            <input id="expMinVal" type="number" placeholder="Min. vr. radova (€)" style="width:170px;" oninput="renderExport()">
-            <input id="expOdGod" type="number" placeholder="Od godine" style="width:110px;" oninput="renderExport()">
-            <button class="btn btn-primary" onclick="copyExport()">Kopiraj tablicu</button>
-          </div>
-        </div>
-        <div id="exportResult"></div>
-      </div>
+
 
       <!-- POSTAVKE -->
       <div class="section" id="sec-postavke">
@@ -542,7 +653,29 @@ function saveConfig(){
   const firma=document.getElementById('cfgFirma').value.trim();
   if(!url||!key){showToast('Unesite URL i Key!');return;}
   localStorage.setItem('sb_url',url);localStorage.setItem('sb_key',key);localStorage.setItem('sb_firma',firma||'Baza referenci');
-  initApp();
+  function showLogin(){
+  document.getElementById('landingPage').style.display='none';
+  document.getElementById('loginPage').style.display='flex';
+}
+
+function showGenSub(name){
+  document.getElementById('genMenu').style.display='none';
+  ['portfelj','cv','popis','export'].forEach(n=>{
+    const el=document.getElementById('genSub-'+n);
+    if(el) el.style.display=n===name?'block':'none';
+  });
+  if(name==='export') renderExport();
+}
+
+function showGenMenu(){
+  document.getElementById('genMenu').style.display='block';
+  ['portfelj','cv','popis','export'].forEach(n=>{
+    const el=document.getElementById('genSub-'+n);
+    if(el) el.style.display='none';
+  });
+}
+
+initApp();
 }
 function resetConfig(){if(!confirm('Resetirati?'))return;localStorage.removeItem('sb_url');localStorage.removeItem('sb_key');location.reload();}
 
@@ -1034,14 +1167,13 @@ function switchTab(name,btn){
   }
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');
-  const titles={dashboard:'Pregled',projekti:'Projekti',inzenjeri:'Inženjeri',generiraj:'Generiraj dokument',export:'Export za natječaj',postavke:'Postavke'};
+  const titles={dashboard:'Pregled',projekti:'Projekti',inzenjeri:'Inženjeri',generiraj:'Generiraj dokument',postavke:'Postavke'};
   document.getElementById('topbarTitle').textContent=titles[name]||name;
   const actEl=document.getElementById('topbarActions');
-  actEl.innerHTML=name==='projekti'?'<button class="btn btn-primary" onclick="openModal()">+ Novi projekt</button>':
-    name==='dashboard'?'<button class="btn btn-primary" onclick="openModal()">+ Novi projekt</button>':'';
+  actEl.innerHTML=(name==='projekti'||name==='dashboard')?'<button class="btn btn-primary" onclick="openModal()">+ Novi projekt</button>':'';
   if(name==='dashboard')renderDashboard();
   if(name==='inzenjeri')renderInzenjeri();
-  if(name==='export')renderExport();
+  if(name==='generiraj')showGenMenu();
   if(name==='postavke')renderInzSettings();
 }
 
@@ -1104,6 +1236,28 @@ function renderDashboard(){
       <div class="dash-bar-track"><div class="dash-bar-fill" style="width:${pct}%"></div></div>
     </div>`;
   }).join('');
+}
+
+function showLogin(){
+  document.getElementById('landingPage').style.display='none';
+  document.getElementById('loginPage').style.display='flex';
+}
+
+function showGenSub(name){
+  document.getElementById('genMenu').style.display='none';
+  ['portfelj','cv','popis','export'].forEach(n=>{
+    const el=document.getElementById('genSub-'+n);
+    if(el) el.style.display=n===name?'block':'none';
+  });
+  if(name==='export') renderExport();
+}
+
+function showGenMenu(){
+  document.getElementById('genMenu').style.display='block';
+  ['portfelj','cv','popis','export'].forEach(n=>{
+    const el=document.getElementById('genSub-'+n);
+    if(el) el.style.display='none';
+  });
 }
 
 initApp();
