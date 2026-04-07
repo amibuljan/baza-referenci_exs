@@ -295,7 +295,7 @@ tbody tr:hover{background:#FAFAF8;}
         <div class="dash-row">
           <div class="dash-card">
             <h3>Zadnji projekti</h3>
-            <div id="dashRecentProj"><div class="empty" style="padding:20px 0;"><div style="font-size:13px;">Učitavanje...</div></div></div>
+            <div id="dashRecentProj"><div style="color:var(--text3);font-size:13px;padding:20px 0;">Nema podataka.</div></div>
           </div>
           <div class="dash-card">
             <h3>Usluge po tipu</h3>
@@ -689,7 +689,9 @@ async function initApp(){
   document.getElementById('settFirma').value=cfg.firma;
   initFieldsCheck();
   await loadData();
-  renderDashboard();populateFilters();
+  populateFilters();
+  renderProjekti();
+  renderDashboard();
 }
 
 async function loadData(){
@@ -899,6 +901,9 @@ function renderExport(){
 function copyExport(){const out=document.getElementById('exportResult');if(!out._raw){showToast('Nema podataka');return;}navigator.clipboard?.writeText(out._raw).then(()=>showToast('Tablica kopirana!')).catch(()=>showToast('Označite tekst ručno'));}
 
 function renderSidebarStats(){
+  if(document.getElementById('sec-dashboard')?.classList.contains('active')) renderDashboard();
+}
+function updateDashboardKPI(){
   if(document.getElementById('sec-dashboard')?.classList.contains('active')) renderDashboard();
 }
 
@@ -1207,6 +1212,7 @@ function switchTab(name,btn){
 }
 
 function renderDashboard(){
+  if(!sbClient){return;}
   const ukupnoVal=projekti.reduce((s,p)=>s+(Number(p.vrijednost)||0),0);
   const ukupnoUsl=projekti.reduce((s,p)=>s+(Number(p.vrijednost_usluge)||0),0);
   const aktivni=projekti.filter(p=>p.status==='U tijeku').length;
