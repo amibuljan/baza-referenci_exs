@@ -697,7 +697,56 @@ function saveConfig(){
   const firma=document.getElementById('cfgFirma').value.trim();
   if(!url||!key){showToast('Unesite URL i Key!');return;}
   localStorage.setItem('sb_url',url);localStorage.setItem('sb_key',key);localStorage.setItem('sb_firma',firma||'Baza referenci');
-  function showLogin(){
+  
+let activeInzIme=null;
+
+function openInzProfile(ime){
+  activeInzIme=ime;
+  const profil=inzProfili[ime]||{};
+  const idx=inzenjeri.indexOf(ime);
+  const[bg,fg]=avatarColor(idx>=0?idx:0);
+  document.getElementById('inzListView').style.display='none';
+  document.getElementById('inzProfileView').style.display='block';
+  const av=document.getElementById('profAvatar');
+  av.textContent=initials(ime);av.style.background=bg;av.style.color=fg;
+  document.getElementById('profIme').textContent=ime;
+  document.getElementById('profObrazovanje').textContent=profil.obrazovanje||'';
+  document.getElementById('profGodine').textContent=profil.godine_iskustva||'–';
+  document.getElementById('profLicenca').textContent=profil.licenca||'–';
+  const projInz=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===ime));
+  document.getElementById('profProjBroj').textContent=projInz.length;
+  const valSum=projInz.reduce((s,p)=>s+(Number(p.vrijednost)||0),0);
+  document.getElementById('profValSum').textContent=valSum>0?(valSum/1000000).toFixed(2)+' M€':'–';
+  const tipBoje3={
+    'Stručni nadzor':{bg:'#E0E8F5',color:'#1A3A6B'},
+    'Vođenje projekta':{bg:'#E6F0DC',color:'#3A6B1A'},
+    'Projektiranje':{bg:'#EDE0F5',color:'#4A1A7A'},
+    'Konzultantske usluge':{bg:'#FDF0D8',color:'#7A4A00'}
+  };
+  const sorted=[...projInz].sort((a,b)=>(b.od||'').localeCompare(a.od||''));
+  document.getElementById('profProjList').innerHTML=sorted.length?sorted.map(p=>{
+    const uloge=getInzUloge(p).filter(u=>u.ime===ime).map(u=>u.uloga).filter(Boolean);
+    const boja=tipBoje3[p.tip]||{bg:'#EFEFEF',color:'#535353'};
+    return`<div class="inz-proj-row">
+      <span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500;background:${boja.bg};color:${boja.color};white-space:nowrap;flex-shrink:0;">${p.tip}</span>
+      <div class="inz-proj-name">${p.naziv}</div>
+      ${uloge.length?`<span style="font-size:11px;color:var(--accent);font-weight:500;white-space:nowrap;">${uloge.join(', ')}</span>`:''}
+      <span class="inz-proj-year">${getYear(p.od)||''}</span>
+      <button class="btn btn-sm" onclick="openModal(${p.id});event.stopPropagation()">uredi</button>
+    </div>`;
+  }).join(''):'<div style="color:var(--text3);font-size:13px;padding:20px 0;">Nema projekata za ovog inženjera.</div>';
+}
+
+function closeInzProfile(){
+  activeInzIme=null;
+  document.getElementById('inzListView').style.display='block';
+  document.getElementById('inzProfileView').style.display='none';
+}
+
+function openModalInzFromProfile(){if(activeInzIme) openModalInz(activeInzIme);}
+function quickCVFromProfile(){if(activeInzIme) quickCV(activeInzIme);}
+
+function showLogin(){
   document.getElementById('landingPage').style.display='none';
   document.getElementById('loginPage').style.display='flex';
 }
@@ -1322,6 +1371,55 @@ function renderDashboard(){
     </div>`;
   }).join('');
 }
+
+
+let activeInzIme=null;
+
+function openInzProfile(ime){
+  activeInzIme=ime;
+  const profil=inzProfili[ime]||{};
+  const idx=inzenjeri.indexOf(ime);
+  const[bg,fg]=avatarColor(idx>=0?idx:0);
+  document.getElementById('inzListView').style.display='none';
+  document.getElementById('inzProfileView').style.display='block';
+  const av=document.getElementById('profAvatar');
+  av.textContent=initials(ime);av.style.background=bg;av.style.color=fg;
+  document.getElementById('profIme').textContent=ime;
+  document.getElementById('profObrazovanje').textContent=profil.obrazovanje||'';
+  document.getElementById('profGodine').textContent=profil.godine_iskustva||'–';
+  document.getElementById('profLicenca').textContent=profil.licenca||'–';
+  const projInz=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===ime));
+  document.getElementById('profProjBroj').textContent=projInz.length;
+  const valSum=projInz.reduce((s,p)=>s+(Number(p.vrijednost)||0),0);
+  document.getElementById('profValSum').textContent=valSum>0?(valSum/1000000).toFixed(2)+' M€':'–';
+  const tipBoje3={
+    'Stručni nadzor':{bg:'#E0E8F5',color:'#1A3A6B'},
+    'Vođenje projekta':{bg:'#E6F0DC',color:'#3A6B1A'},
+    'Projektiranje':{bg:'#EDE0F5',color:'#4A1A7A'},
+    'Konzultantske usluge':{bg:'#FDF0D8',color:'#7A4A00'}
+  };
+  const sorted=[...projInz].sort((a,b)=>(b.od||'').localeCompare(a.od||''));
+  document.getElementById('profProjList').innerHTML=sorted.length?sorted.map(p=>{
+    const uloge=getInzUloge(p).filter(u=>u.ime===ime).map(u=>u.uloga).filter(Boolean);
+    const boja=tipBoje3[p.tip]||{bg:'#EFEFEF',color:'#535353'};
+    return`<div class="inz-proj-row">
+      <span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500;background:${boja.bg};color:${boja.color};white-space:nowrap;flex-shrink:0;">${p.tip}</span>
+      <div class="inz-proj-name">${p.naziv}</div>
+      ${uloge.length?`<span style="font-size:11px;color:var(--accent);font-weight:500;white-space:nowrap;">${uloge.join(', ')}</span>`:''}
+      <span class="inz-proj-year">${getYear(p.od)||''}</span>
+      <button class="btn btn-sm" onclick="openModal(${p.id});event.stopPropagation()">uredi</button>
+    </div>`;
+  }).join(''):'<div style="color:var(--text3);font-size:13px;padding:20px 0;">Nema projekata za ovog inženjera.</div>';
+}
+
+function closeInzProfile(){
+  activeInzIme=null;
+  document.getElementById('inzListView').style.display='block';
+  document.getElementById('inzProfileView').style.display='none';
+}
+
+function openModalInzFromProfile(){if(activeInzIme) openModalInz(activeInzIme);}
+function quickCVFromProfile(){if(activeInzIme) quickCV(activeInzIme);}
 
 function showLogin(){
   document.getElementById('landingPage').style.display='none';
