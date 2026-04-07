@@ -129,35 +129,43 @@ tbody tr:hover{background:#FAFAF8;}
 .inz-uloga-name{font-size:13px;font-weight:500;}
 .inz-uloga-select{font-size:12px;padding:4px 8px;}
 /* INŽENJERI PROFILI */
-.inz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
-.inz-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:all 0.15s;cursor:pointer;position:relative;}
-.inz-card:hover{border-color:var(--accent-mid);box-shadow:0 4px 16px rgba(0,0,0,0.08);transform:translateY(-2px);}
-.avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;flex-shrink:0;}
-.inz-name{font-weight:600;font-size:14px;margin-bottom:2px;}
-.inz-meta{font-size:12px;color:var(--text3);}
-.inz-stat-row{display:flex;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
-.inz-stat{display:flex;flex-direction:column;gap:2px;}
-.inz-stat-val{font-size:18px;font-weight:700;color:var(--text);line-height:1;}
+.inz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+.inz-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;transition:all 0.18s;cursor:pointer;position:relative;overflow:hidden;}
+.inz-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--inz-color,var(--border));transition:background 0.18s;}
+.inz-card:hover{border-color:var(--border-strong);box-shadow:0 6px 20px rgba(0,0,0,0.07);transform:translateY(-2px);}
+.inz-card:hover::after{background:var(--accent-mid);}
+.avatar{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;letter-spacing:-0.02em;}
+.inz-name{font-weight:600;font-size:14px;margin-bottom:3px;line-height:1.3;}
+.inz-meta{font-size:12px;color:var(--text3);line-height:1.4;}
+.inz-card-arrow{position:absolute;top:20px;right:18px;color:var(--text3);font-size:14px;transition:all 0.18s;opacity:0.5;}
+.inz-card:hover .inz-card-arrow{transform:translateX(3px);opacity:1;color:var(--accent-mid);}
+.inz-chips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0;}
+.inz-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:var(--bg);border:1px solid var(--border);border-radius:99px;font-size:11px;color:var(--text2);}
+.inz-chip-dot{width:6px;height:6px;border-radius:50%;background:var(--accent-mid);flex-shrink:0;}
+.inz-divider{height:1px;background:var(--border);margin:14px 0;}
+.inz-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;}
+.inz-stat{display:flex;flex-direction:column;align-items:center;padding:8px 4px;text-align:center;border-right:1px solid var(--border);}
+.inz-stat:last-child{border-right:none;}
+.inz-stat-val{font-size:20px;font-weight:700;color:var(--text);line-height:1;margin-bottom:3px;}
 .inz-stat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;}
-.inz-card-arrow{position:absolute;top:18px;right:16px;font-size:16px;color:var(--text3);transition:transform 0.15s;}
-.inz-card:hover .inz-card-arrow{transform:translateX(3px);color:var(--accent-mid);}
 /* PROFIL PANEL */
-.inz-profile-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;}
-.inz-profile-header{display:flex;align-items:center;gap:16px;padding:20px 24px;border-bottom:1px solid var(--border);}
+.inz-profile-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.inz-profile-header{padding:28px 28px 24px;border-bottom:1px solid var(--border);background:linear-gradient(to bottom,var(--surface2),var(--surface));}
 .inz-profile-info{flex:1;}
-.inz-profile-name{font-size:20px;font-weight:700;}
-.inz-profile-sub{font-size:13px;color:var(--text2);margin-top:3px;}
-.inz-profile-meta{display:flex;gap:24px;padding:16px 24px;background:var(--bg);border-bottom:1px solid var(--border);}
-.inz-profile-meta-item{display:flex;flex-direction:column;gap:2px;}
-.inz-profile-meta-val{font-size:14px;font-weight:600;color:var(--text);}
+.inz-profile-name{font-size:22px;font-weight:700;margin-bottom:4px;}
+.inz-profile-sub{font-size:13px;color:var(--text2);}
+.inz-profile-meta{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);}
+.inz-profile-meta-item{padding:16px 20px;border-right:1px solid var(--border);}
+.inz-profile-meta-item:last-child{border-right:none;}
+.inz-profile-meta-val{font-size:16px;font-weight:600;color:var(--text);margin-bottom:3px;}
 .inz-profile-meta-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;}
-.inz-proj-list{padding:16px 24px;}
-.inz-proj-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.inz-proj-list{padding:0 24px 8px;}
+.inz-proj-list-header{padding:14px 0 10px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);}
+.inz-proj-row{display:grid;grid-template-columns:auto 1fr auto auto auto;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
 .inz-proj-row:last-child{border-bottom:none;}
-.inz-proj-name{flex:1;font-size:13px;font-weight:500;}
-.inz-proj-uloga{font-size:11px;font-weight:500;padding:2px 8px;border-radius:99px;white-space:nowrap;}
+.inz-proj-name{font-size:13px;font-weight:500;color:var(--text);line-height:1.4;}
 .inz-proj-year{font-size:12px;color:var(--text3);font-family:var(--mono);white-space:nowrap;}
-.inz-card-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+.inz-card-actions{display:flex;gap:6px;}
 /* EXPORT */
 .export-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:14px;}
 .export-card h3{font-size:13px;font-weight:600;margin-bottom:12px;}
@@ -407,12 +415,14 @@ tbody tr:hover{background:#FAFAF8;}
           <button onclick="closeInzProfile()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:6px;">← Svi inženjeri</button>
           <div class="inz-profile-panel">
             <div class="inz-profile-header">
-              <div class="avatar" id="profAvatar" style="width:56px;height:56px;font-size:18px;"></div>
-              <div class="inz-profile-info">
-                <div class="inz-profile-name" id="profIme"></div>
-                <div class="inz-profile-sub" id="profObrazovanje"></div>
+              <div style="display:flex;align-items:center;gap:20px;flex:1;">
+                <div class="avatar" id="profAvatar" style="width:64px;height:64px;font-size:20px;flex-shrink:0;"></div>
+                <div class="inz-profile-info">
+                  <div class="inz-profile-name" id="profIme"></div>
+                  <div class="inz-profile-sub" id="profObrazovanje"></div>
+                </div>
               </div>
-              <div style="display:flex;gap:8px;">
+              <div style="display:flex;gap:8px;flex-shrink:0;">
                 <button class="btn btn-sm" onclick="openModalInzFromProfile()">Uredi profil</button>
                 <button class="btn btn-sm btn-gen" onclick="quickCVFromProfile()">↓ CV</button>
               </div>
@@ -724,7 +734,7 @@ function openInzProfile(ime){
     'Konzultantske usluge':{bg:'#FDF0D8',color:'#7A4A00'}
   };
   const sorted=[...projInz].sort((a,b)=>(b.od||'').localeCompare(a.od||''));
-  document.getElementById('profProjList').innerHTML=sorted.length?sorted.map(p=>{
+  document.getElementById('profProjList').innerHTML=sorted.length?`<div class="inz-proj-list-header">Projekti (${sorted.length})</div>`+sorted.map(p=>{
     const uloge=getInzUloge(p).filter(u=>u.ime===ime).map(u=>u.uloga).filter(Boolean);
     const boja=tipBoje3[p.tip]||{bg:'#EFEFEF',color:'#535353'};
     return`<div class="inz-proj-row">
@@ -935,24 +945,43 @@ function renderInzenjeri(){
   const list=inzenjeri.filter(i=>!q||i.toLowerCase().includes(q));
   if(!list.length){grid.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
+  const tipovi=['Stručni nadzor','Vođenje projekta','Projektiranje','Konzultantske usluge'];
   grid.innerHTML=list.map((ime,idx)=>{
     const[bg,fg]=avatarColor(idx);
     const profil=inzProfili[ime]||{};
-    const projBroj=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===ime)).length;
-    const ukupnoVal=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===ime)).reduce((s,p)=>s+(Number(p.vrijednost)||0),0);
-    const aktivni=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===ime)&&p.status==='U tijeku').length;
+    const projInz=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===ime));
+    const projBroj=projInz.length;
+    const aktivni=projInz.filter(p=>p.status==='U tijeku').length;
+    const zavrseni=projInz.filter(p=>p.status==='Završeno').length;
+    // Tipovi usluga kojima je inženjer sudjelovao
+    const tipCnt={};projInz.forEach(p=>{tipCnt[p.tip]=(tipCnt[p.tip]||0)+1;});
+    const chipovi=Object.entries(tipCnt).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    const tipBoje={'Stručni nadzor':'#1A3A6B','Vođenje projekta':'#3A6B1A','Projektiranje':'#4A1A7A','Konzultantske usluge':'#7A4A00'};
     return`<div class="inz-card" onclick="openInzProfile('${ime}')">
       <div class="inz-card-arrow">→</div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-        <div class="avatar" style="background:${bg};color:${fg};">${initials(ime)}</div>
-        <div><div class="inz-name">${ime}</div><div class="inz-meta">${profil.obrazovanje||'–'}</div></div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+        <div class="avatar" style="background:${bg};color:${fg};width:52px;height:52px;font-size:16px;">${initials(ime)}</div>
+        <div style="min-width:0;">
+          <div class="inz-name">${ime}</div>
+          <div class="inz-meta">${profil.obrazovanje||'–'}</div>
+          ${profil.licenca?`<div style="font-size:11px;color:var(--text3);margin-top:2px;font-family:var(--mono);">${profil.licenca}</div>`:''}
+        </div>
       </div>
-      ${profil.licenca?`<div style="font-size:11px;color:var(--text2);margin-bottom:10px;font-family:var(--mono);">${profil.licenca}</div>`:''}
-      <div class="inz-stat-row">
-        <div class="inz-stat"><div class="inz-stat-val">${profil.godine_iskustva||'–'}</div><div class="inz-stat-lbl">God. isku.</div></div>
-        <div class="inz-stat"><div class="inz-stat-val">${projBroj}</div><div class="inz-stat-lbl">Projekata</div></div>
-        <div class="inz-stat"><div class="inz-stat-val">${aktivni}</div><div class="inz-stat-lbl">Aktivnih</div></div>
-        <div class="inz-stat"><div class="inz-stat-val" style="font-size:13px;">${ukupnoVal>0?(ukupnoVal/1000000).toFixed(1)+'M':'–'}</div><div class="inz-stat-lbl">€ radova</div></div>
+      ${chipovi.length?`<div class="inz-chips">${chipovi.map(([t,n])=>`<span class="inz-chip"><span class="inz-chip-dot" style="background:${tipBoje[t]||'#888'};"></span>${t} <span style="color:var(--text3);">(${n})</span></span>`).join('')}</div>`:''}
+      <div class="inz-divider"></div>
+      <div class="inz-stats">
+        <div class="inz-stat">
+          <div class="inz-stat-val">${profil.godine_iskustva||'–'}</div>
+          <div class="inz-stat-lbl">god. isku.</div>
+        </div>
+        <div class="inz-stat">
+          <div class="inz-stat-val">${projBroj}</div>
+          <div class="inz-stat-lbl">projekata</div>
+        </div>
+        <div class="inz-stat">
+          <div class="inz-stat-val" style="color:${aktivni>0?'var(--accent-mid)':'var(--text)'};">${aktivni}</div>
+          <div class="inz-stat-lbl">aktivnih</div>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -1399,7 +1428,7 @@ function openInzProfile(ime){
     'Konzultantske usluge':{bg:'#FDF0D8',color:'#7A4A00'}
   };
   const sorted=[...projInz].sort((a,b)=>(b.od||'').localeCompare(a.od||''));
-  document.getElementById('profProjList').innerHTML=sorted.length?sorted.map(p=>{
+  document.getElementById('profProjList').innerHTML=sorted.length?`<div class="inz-proj-list-header">Projekti (${sorted.length})</div>`+sorted.map(p=>{
     const uloge=getInzUloge(p).filter(u=>u.ime===ime).map(u=>u.uloga).filter(Boolean);
     const boja=tipBoje3[p.tip]||{bg:'#EFEFEF',color:'#535353'};
     return`<div class="inz-proj-row">
