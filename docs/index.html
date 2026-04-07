@@ -502,7 +502,7 @@ tbody tr:hover{background:#FAFAF8;}
       <div class="section" id="sec-postavke">
         <div class="settings-section">
           <h3>Inženjeri</h3>
-          <div style="display:flex;gap:8px;margin-bottom:14px;"><input id="newInzName" placeholder="Ime i prezime" style="flex:1;"><button class="btn btn-primary" onclick="addInzenjer()">Dodaj</button></div>
+          <div style="margin-bottom:12px;"><button class="btn btn-primary" onclick="openAddInzModal()">+ Novi inženjer</button></div>
           <div id="inzListSettings"></div>
         </div>
         <div class="settings-section">
@@ -591,7 +591,7 @@ tbody tr:hover{background:#FAFAF8;}
         <div class="form-section">
           <div class="form-section-title">Osobni podaci</div>
           <div class="form-grid">
-            <div class="form-group form-full"><label>Ime i prezime</label><input id="iIme" disabled style="background:var(--surface2);"></div>
+            <div class="form-group form-full"><label>Ime i prezime</label><input id="iIme" placeholder="npr. Ana Kovač"></div>
             <div class="form-group form-full"><label>Struka i razina obrazovanja</label><input id="iObrazovanje" placeholder="npr. Diplomirani inženjer građevinarstva"></div>
             <div class="form-group"><label>Godine iskustva</label><input id="iGodine" type="number" placeholder="npr. 15" min="0" max="50"></div>
             <div class="form-group"><label>Licenca / strukovni broj</label><input id="iLicenca" placeholder="npr. G 1234"></div>
@@ -603,6 +603,7 @@ tbody tr:hover{background:#FAFAF8;}
       </div>
       <div class="modal-footer">
         <button class="btn" onclick="closeModalInz()">Odustani</button>
+        <button class="btn btn-danger btn-sm" id="btnDeleteInz" style="margin-right:auto;display:none;" onclick="deleteInzenjer()">Ukloni inženjera</button>
         <button class="btn btn-primary" onclick="saveInzProfil()">Spremi profil</button>
       </div>
     </div>
@@ -909,41 +910,59 @@ function renderInzSettings(){
   }).join('');
 }
 
-async function addInzenjer(){
-  const inp=document.getElementById('newInzName');const ime=inp.value.trim();
-  if(!ime)return;if(inzenjeri.includes(ime)){showToast('Inženjer već postoji');return;}
-  const{error}=await sbClient.from('inzenjeri').insert({ime});
-  if(error){showToast('Greška: '+error.message);return;}
-  inzenjeri.push(ime);inzenjeri.sort();inp.value='';
-  populateFilters();renderInzSettings();renderSidebarStats();showToast(ime+' dodan!');
-}
 async function removeInzenjer(ime){
   const cnt=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===ime)).length;
   if(cnt>0&&!confirm(`${ime} je na ${cnt} projekata. Svejedno ukloniti?`))return;
   const{error}=await sbClient.from('inzenjeri').delete().eq('ime',ime);
   if(error){showToast('Greška: '+error.message);return;}
   inzenjeri=inzenjeri.filter(i=>i!==ime);delete inzProfili[ime];
-  populateFilters();renderInzSettings();renderSidebarStats();showToast(ime+' uklonjen');
+  populateFilters();renderInzSettings();renderInzenjeri();renderSidebarStats();showToast(ime+' uklonjen');
 }
 function saveFirmaName(){const ime=document.getElementById('settFirma').value.trim();if(!ime)return;localStorage.setItem('sb_firma',ime);document.getElementById('firmNameDisplay').textContent=ime;showToast('Naziv firme spremljen!');}
 
 // MODAL INŽENJER
+function openAddInzModal(){
+  editInzIme=null;
+  document.getElementById('modalInzTitle').textContent='Novi inženjer';
+  document.getElementById('iIme').value='';
+  document.getElementById('iIme').disabled=false;
+  document.getElementById('iObrazovanje').value='';
+  document.getElementById('iGodine').value='';
+  document.getElementById('iLicenca').value='';
+  document.getElementById('iEmail').value='';
+  document.getElementById('iTelefon').value='';
+  document.getElementById('iNapomena').value='';
+  document.getElementById('btnDeleteInz').style.display='none';
+  document.getElementById('modalInz').style.display='block';
+}
 function openModalInz(ime){
   editInzIme=ime;
   const p=inzProfili[ime]||{};
   document.getElementById('modalInzTitle').textContent='Profil: '+ime;
   document.getElementById('iIme').value=ime;
+  document.getElementById('iIme').disabled=true;
   document.getElementById('iObrazovanje').value=p.obrazovanje||'';
   document.getElementById('iGodine').value=p.godine_iskustva||'';
   document.getElementById('iLicenca').value=p.licenca||'';
   document.getElementById('iEmail').value=p.email||'';
   document.getElementById('iTelefon').value=p.telefon||'';
   document.getElementById('iNapomena').value=p.napomena_profil||'';
+  document.getElementById('btnDeleteInz').style.display='inline-flex';
   document.getElementById('modalInz').style.display='block';
 }
 function closeModalInz(){document.getElementById('modalInz').style.display='none';editInzIme=null;}
+async function deleteInzenjer(){
+  if(!editInzIme||!confirm('Ukloniti '+editInzIme+'?'))return;
+  const cnt=projekti.filter(p=>getInzUloge(p).some(u=>u.ime===editInzIme)).length;
+  if(cnt>0&&!confirm(editInzIme+' je na '+cnt+' projekata. Svejedno ukloniti?'))return;
+  const{error}=await sbClient.from('inzenjeri').delete().eq('ime',editInzIme);
+  if(error){showToast('Greška: '+error.message);return;}
+  inzenjeri=inzenjeri.filter(i=>i!==editInzIme);delete inzProfili[editInzIme];
+  closeModalInz();populateFilters();renderInzenjeri();renderSidebarStats();showToast('Inženjer uklonjen');
+}
 async function saveInzProfil(){
-  if(!editInzIme)return;
+  const ime=document.getElementById('iIme').value.trim();
+  if(!ime){showToast('Unesite ime i prezime!');return;}
   const data={
     obrazovanje:document.getElementById('iObrazovanje').value.trim()||null,
     godine_iskustva:Number(document.getElementById('iGodine').value)||null,
@@ -952,10 +971,21 @@ async function saveInzProfil(){
     telefon:document.getElementById('iTelefon').value.trim()||null,
     napomena_profil:document.getElementById('iNapomena').value.trim()||null,
   };
-  const{error}=await sbClient.from('inzenjeri').update(data).eq('ime',editInzIme);
-  if(error){showToast('Greška: '+error.message);return;}
-  inzProfili[editInzIme]={...inzProfili[editInzIme],...data,ime:editInzIme};
-  closeModalInz();renderInzenjeri();showToast('Profil spremenjen!');
+  if(!editInzIme){
+    // NOVI inženjer
+    if(inzenjeri.includes(ime)){showToast('Inženjer već postoji!');return;}
+    const{error}=await sbClient.from('inzenjeri').insert({ime,...data});
+    if(error){showToast('Greška: '+error.message);return;}
+    inzenjeri.push(ime);inzenjeri.sort();
+    inzProfili[ime]={ime,...data};
+    closeModalInz();populateFilters();renderInzenjeri();renderInzSettings();renderSidebarStats();showToast(ime+' dodan!');
+  } else {
+    // UREDI postojećeg
+    const{error}=await sbClient.from('inzenjeri').update(data).eq('ime',editInzIme);
+    if(error){showToast('Greška: '+error.message);return;}
+    inzProfili[editInzIme]={...inzProfili[editInzIme],...data,ime:editInzIme};
+    closeModalInz();renderInzenjeri();showToast('Profil spremljen!');
+  }
 }
 
 // MODAL PROJEKT
@@ -1170,7 +1200,13 @@ function switchTab(name,btn){
   const titles={dashboard:'Pregled',projekti:'Projekti',inzenjeri:'Inženjeri',generiraj:'Generiraj dokument',postavke:'Postavke'};
   document.getElementById('topbarTitle').textContent=titles[name]||name;
   const actEl=document.getElementById('topbarActions');
-  actEl.innerHTML=(name==='projekti'||name==='dashboard')?'<button class="btn btn-primary" onclick="openModal()">+ Novi projekt</button>':'';
+  if(name==='projekti'||name==='dashboard'){
+    actEl.innerHTML='<button class="btn btn-primary" onclick="openModal()">+ Novi projekt</button>';
+  } else if(name==='inzenjeri'){
+    actEl.innerHTML='<button class="btn btn-primary" onclick="openAddInzModal()">+ Novi inženjer</button>';
+  } else {
+    actEl.innerHTML='';
+  }
   if(name==='dashboard')renderDashboard();
   if(name==='inzenjeri')renderInzenjeri();
   if(name==='generiraj')showGenMenu();
