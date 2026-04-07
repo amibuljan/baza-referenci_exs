@@ -685,8 +685,10 @@ async function initApp(){
   sbClient=window.supabase.createClient(cfg.url,cfg.key);
   document.getElementById('configScreen').style.display='none';
   document.getElementById('appRoot').style.display='block';
-  document.getElementById('firmNameDisplay').textContent=cfg.firma;
-  document.getElementById('settFirma').value=cfg.firma;
+  const fnd=document.getElementById('firmNameDisplay');
+  if(fnd) fnd.textContent=cfg.firma;
+  const sf=document.getElementById('settFirma');
+  if(sf) sf.value=cfg.firma;
   initFieldsCheck();
   await loadData();
   populateFilters();
@@ -901,7 +903,7 @@ function renderExport(){
 function copyExport(){const out=document.getElementById('exportResult');if(!out._raw){showToast('Nema podataka');return;}navigator.clipboard?.writeText(out._raw).then(()=>showToast('Tablica kopirana!')).catch(()=>showToast('Označite tekst ručno'));}
 
 function renderSidebarStats(){
-  if(document.getElementById('sec-dashboard')?.classList.contains('active')) renderDashboard();
+  try{if(document.getElementById('sec-dashboard')?.classList.contains('active')) renderDashboard();}catch(e){}
 }
 function updateDashboardKPI(){
   if(document.getElementById('sec-dashboard')?.classList.contains('active')) renderDashboard();
@@ -922,7 +924,7 @@ async function removeInzenjer(ime){
   inzenjeri=inzenjeri.filter(i=>i!==ime);delete inzProfili[ime];
   populateFilters();renderInzSettings();renderInzenjeri();renderSidebarStats();showToast(ime+' uklonjen');
 }
-function saveFirmaName(){const ime=document.getElementById('settFirma').value.trim();if(!ime)return;localStorage.setItem('sb_firma',ime);document.getElementById('firmNameDisplay').textContent=ime;showToast('Naziv firme spremljen!');}
+function saveFirmaName(){const el=document.getElementById('settFirma');if(!el)return;const ime=el.value.trim();if(!ime)return;localStorage.setItem('sb_firma',ime);const fnd=document.getElementById('firmNameDisplay');if(fnd)fnd.textContent=ime;showToast('Naziv firme spremljen!');}
 
 // MODAL INŽENJER
 function openAddInzModal(){
@@ -1204,7 +1206,7 @@ function switchTab(name,btn){
   const titles={dashboard:'Pregled',projekti:'Projekti',inzenjeri:'Inženjeri',generiraj:'Generiraj dokument',postavke:'Postavke'};
   document.getElementById('topbarTitle').textContent=titles[name]||name;
   const actEl=document.getElementById('topbarActions');
-  actEl.innerHTML='';
+  if(actEl) actEl.innerHTML='';
   if(name==='dashboard')renderDashboard();
   if(name==='inzenjeri')renderInzenjeri();
   if(name==='generiraj')showGenMenu();
